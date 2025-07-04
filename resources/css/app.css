@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Đặt font chữ mặc định cho toàn bộ trang */
+body, html {
+    font-family: 'Bahnschrift', Arial, sans-serif;
+}
+
+/* Đảm bảo nút Log in/Log out trong header có cursor pointer */
+.text-sm\/6.font-semibold.text-gray-600.hover\:text-black,
+.-mx-3.block.rounded-lg.px-3.py-2\.5.text-base\/7.font-semibold.text-gray-600.hover\:text-black.hover\:bg-gray-50,
+button.text-sm\/6.font-semibold.text-gray-600.hover\:text-black,
+button.-mx-3.block.w-full.text-left.rounded-lg.px-3.py-2\.5.text-base\/7.font-semibold.text-gray-600.hover\:text-black.hover\:bg-gray-50 {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
