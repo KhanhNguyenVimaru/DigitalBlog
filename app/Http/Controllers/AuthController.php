@@ -1,9 +1,12 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+
 class AuthController extends Controller
 {
     public function signup(Request $request)
@@ -24,7 +27,6 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
             'user' => $user->name,
         ], 201);
-       
     }
     public function login(Request $request)
     {
@@ -32,24 +34,27 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required'
         ]);
-        if(Auth::attempt([
+        if (Auth::attempt([
             'email' => $request->email,
             'password' => $request->password
-        ])){
+        ])) {
             $user = Auth::user();
             $token = $user->createToken('myApp')->accessToken;
             return response()->json([
                 'access_token' => $token,
                 'token_type' => 'Bearer',
                 'user' => $user,
-            ], 200);
+            ], 200); 
         };
         return response()->json(['error' => 'Unauthorized'], 401);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->token()->revoke(); // ← Thu hồi token hiện tại
+        $request->user()->tokens->each(function ($token) {
+            $token->revoke();
+            $token->delete();
+        });
         return response()->json(['message' => 'Successfully logged out']);
     }
 }

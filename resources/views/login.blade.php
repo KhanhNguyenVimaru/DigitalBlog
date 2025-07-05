@@ -6,14 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Blog</title>
+    <title>Login - Blog</title>
     <link rel="icon" type="image/x-icon" href="https://www.svgrepo.com/show/475713/blog.svg">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body style="height: 100vh">
-    @include('header')
-    <section class="bg-gray-100 flex " style="height: 90vh">
+<body class="bg-gray-100" style="height: 100vh">
+    <section class="flex justify-center items-center" style="height: 100vh">
         <div class="flex flex-col items-center px-6 py-10 mx-auto w-full">
             <div
                 class="w-full bg-white rounded-2xl shadow-2xl border border-gray-200 md:mt-0 sm:max-w-md xl:p-0 transition-all duration-300" >
@@ -57,7 +56,7 @@
                             class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Sign
                             in</button>
                         <p class="text-sm font-light text-gray-500">
-                            Don’t have an account yet? <a href="{{ route('signup') }}"
+                            Don't have an account yet? <a href="{{ route('signup') }}"
                                 class="font-medium text-blue-600 hover:underline">Sign up</a>
                         </p>
                     </form>
@@ -65,7 +64,6 @@
             </div>
         </div>
     </section>
-    <p>{{ Auth::user() }}</p>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     </div>
 

@@ -10,9 +10,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body style="height: 100vh">
-    @include('header')
-    <section class="bg-gray-100 flex justify-center items-center" style="height: 90vh">
+<body class="bg-gray-100" style="height: 100vh">
+    <section class="flex justify-center items-center" style="height: 100vh">
         <div class="flex flex-col items-center px-6 py-10 mx-auto w-full">
             <div
                 class="w-full bg-white rounded-2xl shadow-2xl border border-gray-200 md:mt-0 sm:max-w-md xl:p-0 transition-all duration-300" >

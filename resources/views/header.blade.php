@@ -1,7 +1,7 @@
 <header class="bg-white z-50">
     <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
         <div class="flex lg:flex-1">
-            <a href="#" class="-m-1.5 p-1.5">
+            <a href="/" class="-m-1.5 p-1.5">
 
                 <span class = "text-md font-bold" style="color: #2832c2">DIGITAL BLOG</span>
             </a>
@@ -24,9 +24,11 @@
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
 
-
+            @php
+                $user = Auth::user();
+            @endphp
             <a id="login-link" style="display:none" href="/page_login" class="text-sm/6 font-semibold text-gray-600 hover:text-black">Log in<span aria-hidden="true">&rarr;</span></a>
-            <a id="logout-link" type="button" class="text-sm/6 font-semibold text-gray-600 hover:text-black" style="display:none">Log out</a>
+            <a id="account-link" href="/page_account" type="button" class="text-sm/6 font-semibold text-gray-600 hover:text-black" style="display:none">{{$user->name}}</a>
         </div>
     </nav>
     <!-- Mobile menu, show/hide based on menu open state. -->
@@ -80,37 +82,15 @@
         </div>
     </div>
 </header>
-<form id="logout-form" action="/logout" method="POST" style="display:none;">
-    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-</form>
+
 <script>
     document.addEventListener('DOMContentLoaded', function(){
         if(localStorage.getItem('token') === null){
             document.getElementById('login-link').style.display = 'block';
-            document.getElementById('logout-link').style.display = 'none';
+            document.getElementById('account-link').style.display = 'none';
         }else{
             document.getElementById('login-link').style.display = 'none';
-            document.getElementById('logout-link').style.display = 'block';
+            document.getElementById('account-link').style.display = 'block';
         }
-    });
-</script>
-<script>
-    document.getElementById('logout-link').addEventListener('click', function(e) {
-        e.preventDefault();
-        const token = localStorage.getItem('token');
-        console.log(token);
-        fetch('/logout', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                'Accept': 'application/json'
-            }
-        }).then(response => {
-            if (response.ok) {
-                localStorage.clear();
-                window.location.href = '/page_login';
-            }
-        });
     });
 </script>
