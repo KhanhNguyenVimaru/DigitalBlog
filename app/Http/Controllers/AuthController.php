@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifySignUpMail;
 
 class AuthController extends Controller
 {
@@ -13,21 +16,32 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|max:255',
+            'email' => 'required|string|max:255|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
         ]);
-        $user = User::query()->create([
+
+        // Generate verification token
+        $verification_token = Str::random(60);
+
+        // Create user with verification token
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'verification_token' => $verification_token,
         ]);
-        $token = $user->createToken('MyApp')->accessToken;
-        return request()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user->name,
+
+        // Create verification URL
+        $verifyUrl = url('/verify-email/' . $verification_token);
+
+        // Send verification email
+        Mail::to($user->email)->send(new VerifySignUpMail($user, $verifyUrl));
+
+        return response()->json([
+            'message' => 'Registration successful. Please check your email to verify your account.'
         ], 201);
     }
+
     public function login(Request $request)
     {
         $request->validate([
@@ -39,11 +53,14 @@ class AuthController extends Controller
             'password' => $request->password
         ])) {
             $user = Auth::user();
+            if (is_null($user->email_verified_at)) {
+                return response()->json(['error' => 'Please verify your email before logging in.'], 403);
+            }
             $token = $user->createToken('myApp')->accessToken;
             return response()->json([
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'user' => $user,
+                'user' => $user->name,
             ], 200); 
         };
         return response()->json(['error' => 'Unauthorized'], 401);
@@ -56,5 +73,17 @@ class AuthController extends Controller
             $token->delete();
         });
         return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    public function verifyEmail($token)
+    {
+        $user = User::where('verification_token', $token)->first();
+        if (!$user) {
+            return redirect('/page_login')->with('error', 'Invalid or expired verification link.');
+        }
+        $user->email_verified_at = now();
+        $user->verification_token = null;
+        $user->save();
+        return redirect('/page_login')->with('success', 'Your email has been verified!');
     }
 }

@@ -11,10 +11,12 @@ function getCsrfToken() {
 
 // AJAX Signup
 const signupForm = document.getElementById('signupForm');
+const signupSpinner = document.getElementById('signupSpinner');
 if (signupForm) {
     signupForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(signupForm);
+        if (signupSpinner) signupSpinner.style.display = 'flex';
         try {
             const response = await fetch('/handle_signup', {
                 method: 'POST',
@@ -22,18 +24,20 @@ if (signupForm) {
                     'X-CSRF-TOKEN': getCsrfToken(),
                     'Accept': 'application/json',
                 },
-                body: formData
+                body: formData  
             });
             const data = await response.json();
+            if (signupSpinner) signupSpinner.style.display = 'none';
             if (response.ok) {
-                Swal.fire({icon: 'success', title: 'Registration successful!', text: 'You can now log in.'}).then(() => {
-                    window.location.href = '/page_login';
+                Swal.fire({icon: 'success', title: 'Registration successful!', text: 'A verification email has been sent. Please check your inbox to verify your account.'}).then(() => {
+                    window.location.href = '/signup-success';
                 });
             } else {
                 let msg = data.message || data.error || 'Registration failed';
                 Swal.fire({icon: 'error', title: 'Error', text: msg});
             }
         } catch (err) {
+            if (signupSpinner) signupSpinner.style.display = 'none';
             Swal.fire({icon: 'error', title: 'Error', text: 'An error occurred, please try again.'});
         }
     });
