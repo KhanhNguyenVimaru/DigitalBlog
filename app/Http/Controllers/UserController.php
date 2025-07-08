@@ -53,4 +53,41 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:6|confirmed',
+        ]);
+
+        $user = $request->user();
+
+        if (!\Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'message' => 'Current password is incorrect.'
+            ], 422);
+        }
+
+        $user->password = \Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'message' => 'Password changed successfully.'
+        ], 200);
+    }
+
+    public function updateAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        $user = Auth::user();
+        $file = $request->file('avatar');
+        $filename = 'avatar_' . $user->id . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('avatars', $filename, 'public');
+        $user->avatar = '/storage/' . $path;
+        $user->save();
+        return response()->json(['success' => true, 'avatar_url' => $user->avatar]);
+    }
 }

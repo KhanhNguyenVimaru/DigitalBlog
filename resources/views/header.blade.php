@@ -56,13 +56,13 @@
                 <div class="-my-6 divide-y divide-gray-500/10">
                     <div class="space-y-2 py-6">
                         <a href="/"
-                            class="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-600 hover:text-black hover:bg-gray-50">Feed</a>
+                            class="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-400 hover:text-black hover:bg-gray-50">Feed</a>
                         <a href="#"
-                            class="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-600 hover:text-black hover:bg-gray-50">Community</a>
+                            class="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-400 hover:text-black hover:bg-gray-50">Community</a>
                         <a href="#"
-                            class="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-600 hover:text-black hover:bg-gray-50">Writting</a>
+                            class="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-400 hover:text-black hover:bg-gray-50">Writting</a>
                         <a href="#"
-                            class="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-600 hover:text-black hover:bg-gray-50">About
+                            class="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-400 hover:text-black hover:bg-gray-50">About
                             Us</a>
                     </div>
                     <div class="py-6">

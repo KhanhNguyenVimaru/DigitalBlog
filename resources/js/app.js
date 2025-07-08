@@ -1,4 +1,6 @@
 import './bootstrap';
+import Cropper from 'cropperjs';
+import 'cropperjs/dist/cropper.css';
 
 // Helper to get CSRF token from meta or input
 function getCsrfToken() {
@@ -74,3 +76,76 @@ if (loginForm) {
         }
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Avatar crop logic
+    const avatarInput = document.getElementById('avatarInput');
+    const avatarPreview = document.getElementById('avatarPreview');
+    let cropper;
+    let cropModal = document.getElementById('cropModal');
+    let cropBtn = document.getElementById('cropBtn');
+    let cropImage = document.getElementById('cropImage');
+
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    cropImage.src = event.target.result;
+                    cropModal.style.display = 'flex';
+                    if (cropper) cropper.destroy();
+                    cropper = new Cropper(cropImage, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        preview: avatarPreview
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    if (cropBtn) {
+        cropBtn.addEventListener('click', function() {
+            if (cropper) {
+                const canvas = cropper.getCroppedCanvas({ width: 256, height: 256 });
+                canvas.toBlob(function(blob) {
+                    const formData = new FormData();
+                    formData.append('avatar', blob, 'avatar.png');
+                    fetch('/update-avatar', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': getCsrfToken(),
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.avatar_url) {
+                            avatarPreview.src = data.avatar_url + '?t=' + Date.now();
+                        } else {
+                            alert('Upload failed!');
+                        }
+                    })
+                    .catch(() => alert('Upload failed!'));
+                }, 'image/png');
+                cropModal.style.display = 'none';
+                if (cropper) cropper.destroy();
+            }
+        });
+    }
+    // Close modal on click outside
+    if (cropModal) {
+        cropModal.addEventListener('click', function(e) {
+            if (e.target === cropModal) {
+                cropModal.style.display = 'none';
+                if (cropper) cropper.destroy();
+            }
+        });
+    }
+    if (avatarInput && avatarPreview) {
+        avatarPreview.addEventListener('click', function() {
+            avatarInput.click();
+        });
+    }
+});

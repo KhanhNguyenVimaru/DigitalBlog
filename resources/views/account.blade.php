@@ -12,11 +12,32 @@
 
 <body class="bg-gray-100 min-h-screen">
     @include('header')
-
     <div class="flex justify-center items-start min-h-[calc(100vh-64px)] p-0">
         <div class="bg-white w-1/2 rounded-2xl shadow-2xl border border-gray-200 p-8 mt-4 mb-10">
             <div class="space-y-6">
-
+                <div class="h-full h-[100px] flex items-center justify-center">
+                    <div class="flex flex-col items-center justify-center">
+                        <div
+                            class="flex items-center justify-center w-40 h-40 rounded-full bg-gray-200 overflow-hidden border border-gray-200">
+                            <img id="avatarPreview"
+                                src="{{ Auth::user()->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}"
+                                alt="User Avatar" class="w-full h-full rounded-full object-cover cursor-pointer ">
+                        </div>
+                        <input type="file" id="avatarInput" accept="image/*" style="display:none">
+                        <!-- Modal cropper -->
+                        <div id="cropModal"
+                            style="display:none; position:fixed; z-index:9999; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+                            <div
+                                style="background:#fff; padding:24px; border-radius:12px; max-width:90vw; max-height:90vh; display:flex; flex-direction:column; align-items:center;">
+                                <img id="cropImage" src=""
+                                    style="max-width:500px; max-height:500px; display:block;">
+                                <button id="cropBtn"
+                                    class="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Crop &
+                                    Preview</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Title -->
                 <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-600 md:text-2xl text-center">
                     Account Settings
@@ -49,7 +70,7 @@
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-600">Privacy</label>
                         <select class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full"
-                            name = "privacy" value = "{{ $user->privacy }}">
+                            style="height: 40px; important;" name = "privacy" value = "{{ $user->privacy }}">
                             <option value="public" {{ old('privacy', $user->privacy) == 'public' ? 'selected' : '' }}>
                                 Public</option>
                             <option value="private" {{ old('privacy', $user->privacy) == 'private' ? 'selected' : '' }}>
@@ -72,20 +93,26 @@
                         </button>
                     </div>
                 </form>
-
                 <!-- Change password -->
-                <form class="space-y-4">
+                <form id="change-password-form" class="space-y-4" method="POST" action="/change_password">
+                    @csrf
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-600">Current password</label>
+                        <input type="password" name="current_password"
+                            class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full"
+                            placeholder="Current password" required />
+                    </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-600">New password</label>
-                        <input type="password"
+                        <input type="password" name="new_password"
                             class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full"
-                            placeholder="New password" />
+                            placeholder="New password" required />
                     </div>
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-600">Confirm new password</label>
-                        <input type="password"
+                        <input type="password" name="new_password_confirmation"
                             class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full"
-                            placeholder="Confirm new password" />
+                            placeholder="Confirm new password" required />
                     </div>
                     <div class="flex justify-end">
                         <button type="submit"
@@ -94,11 +121,13 @@
                         </button>
                     </div>
                 </form>
+                <hr class="my-6 border-gray-200 w-9/10 mx-auto" />
 
                 <!-- Logout and Delete Account -->
                 <div class="flex gap-4 mt-10">
                     <!-- Delete Account -->
-                    <form id="delete-account-form" action="{{ route('deleteUserAccount') }}" method="POST" class="flex-1">
+                    <form id="delete-account-form" action="{{ route('deleteUserAccount') }}" method="POST"
+                        class="flex-1">
                         @csrf
                         @method('DELETE')
                         <div class="flex justify-end">
@@ -143,6 +172,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const logoutForm = document.getElementById('logout-form-account');
             const deleteAccountForm = document.getElementById('delete-account-form');
+            const changePasswordForm = document.getElementById('change-password-form');
 
             if (logoutForm) {
                 logoutForm.addEventListener('submit', function(e) {
@@ -243,6 +273,56 @@
                                 });
                         }
                     });
+                });
+            }
+
+            if (changePasswordForm) {
+                changePasswordForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const token = localStorage.getItem('token');
+                    const formData = new FormData(changePasswordForm);
+
+                    fetch('/change_password', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                                'Accept': 'application/json'
+                            },
+                            body: formData
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Password changed!',
+                                    text: 'Your password has been changed successfully.',
+                                    showConfirmButton: true
+                                }).then(() => {
+                                    window.location.href =
+                                    '/page_account'; // Redirect to account page after successful change
+                                });
+                            } else {
+                                response.json().then(data => {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error changing password',
+                                        text: data.message ||
+                                            'An unexpected error occurred.',
+                                        showConfirmButton: true
+                                    });
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error changing password:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error changing password',
+                                text: 'An unexpected error occurred.',
+                                showConfirmButton: true
+                            });
+                        });
                 });
             }
         });

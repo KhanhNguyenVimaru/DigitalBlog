@@ -84,6 +84,7 @@ class AuthController extends Controller
         $user->email_verified_at = now();
         $user->verification_token = null;
         $user->save();
-        return redirect('/page_login')->with('success', 'Your email has been verified!');
+        $message = 'Your email has been verified successfully. You can now log in.';
+        return redirect('/page_login')->with(compact('message'));
     }
 }

@@ -12,27 +12,30 @@
 </head>
 
 <body class="bg-gray-100" style="height: 100vh">
+    @if (session('message'))
+        <div class="w-full h-12 bg-green-200 p-3">
+            {{ session('message') }}
+        </div>
+    @endif
     <section class="flex justify-center items-center" style="height: 100vh">
         <div class="flex flex-col items-center px-6 py-10 mx-auto w-full">
             <div
-                class="w-full bg-white rounded-2xl shadow-2xl border border-gray-200 md:mt-0 sm:max-w-md xl:p-0 transition-all duration-300" >
+                class="w-full bg-white rounded-2xl shadow-2xl border border-gray-200 md:mt-0 sm:max-w-md xl:p-0 transition-all duration-300">
                 <div class="p-10 space-y-6 flex flex-col justify-center h-full">
-                    <h1
-                        class="text-xl font-bold leading-tight tracking-tight text-gray-600 md:text-2xl">
+                    <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-600 md:text-2xl">
                         Sign in to your account
                     </h1>
                     <form id="loginForm" class="space-y-4 md:space-y-6">
                         @csrf
                         <div>
-                            <label for="email"
-                                class="block mb-2 text-sm font-medium text-gray-600">Your email</label>
+                            <label for="email" class="block mb-2 text-sm font-medium text-gray-600">Your
+                                email</label>
                             <input type="email" name="email" id="email"
                                 class="bg-white border border-gray-200 text-gray-600 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 required="">
                         </div>
                         <div>
-                            <label for="password"
-                                class="block mb-2 text-sm font-medium text-gray-600">Password</label>
+                            <label for="password" class="block mb-2 text-sm font-medium text-gray-600">Password</label>
                             <input type="password" name="password" id="password"
                                 class="bg-white border border-gray-200 text-gray-600 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 required="">
@@ -47,8 +50,7 @@
                                     <label for="remember" class="text-gray-500">Remember me</label>
                                 </div>
                             </div>
-                            <a href="#"
-                                class="text-sm font-medium text-blue-600 hover:underline">Forgot
+                            <a href="#" class="text-sm font-medium text-blue-600 hover:underline">Forgot
                                 password?</a>
                         </div>
                         <button type="submit"
