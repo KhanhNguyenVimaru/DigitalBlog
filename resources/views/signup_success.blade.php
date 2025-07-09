@@ -13,7 +13,6 @@
         <p class="text-gray-700 mb-6 text-center">Thank you for signing up.<br>
             We have sent a verification email to your inbox.<br>
             Please check your email and click the verification link to activate your account.</p>
-        <a href="/page_login" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">Back to Login</a>
     </div>
 </body>
 </html> 

@@ -148,4 +148,18 @@ document.addEventListener('DOMContentLoaded', function() {
             avatarInput.click();
         });
     }
+    // Dropdown cho desktop (account)
+    const accountLink = document.getElementById('account-link');
+    const accountDropdown = document.getElementById('account-dropdown');
+    if(accountLink && accountDropdown){
+        accountLink.addEventListener('click', function(e){
+            e.preventDefault();
+            accountDropdown.classList.toggle('hidden');
+        });
+        document.addEventListener('click', function(e){
+            if(!accountDropdown.contains(e.target) && !accountLink.contains(e.target)){
+                accountDropdown.classList.add('hidden');
+            }
+        });
+    }
 });

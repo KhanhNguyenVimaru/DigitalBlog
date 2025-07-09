@@ -12,12 +12,9 @@
 <body>
     {{-- <h1 class="text-3xl font-bold text-blue-500">Hello Tailwind!</h1> --}}
     @include('header')
-    @php
-        $user = Auth::user();
-    @endphp
-    <p>{{ $user->name }}</p>
-    <button onclick="console.log(localStorage.getItem('token'))">check token</button>
-    <button onclick="console.log({{$user}})">check auth</button>
+    <div class = "container mx-auto px-4">
+        @yield('content')
+    </div>
 </body>
 
 </html>
