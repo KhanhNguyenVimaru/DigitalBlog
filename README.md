@@ -7,3 +7,8 @@ Account privacy
 - Send a verification email with a confirmation link upon signup 
 - Handle tokens such as access tokens, verification tokens, etc.
 
+_____________________________________________________________________________________________
+Technology:
+-Laravel 
+-Tailwind 
+-MySQL
