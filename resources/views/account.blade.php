@@ -18,7 +18,7 @@
                 <div class="h-full h-[100px] flex items-center justify-center">
                     <div class="flex flex-col items-center justify-center">
                         <div
-                            class="flex items-center justify-center w-30 h-30 rounded-full bg-gray-200 overflow-hidden border border-gray-200">
+                            class="flex items-center justify-center w-28 h-28 rounded-full bg-gray-200 overflow-hidden border border-gray-200">
                             <img id="avatarPreview"
                                 src="{{ Auth::user()->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}"
                                 alt="User Avatar" class="w-full h-full rounded-full object-cover cursor-pointer ">
@@ -96,7 +96,7 @@
                     </div>
 
                     <!-- Description -->
-                    <div>
+                    <div class="mb-0">
                         <label class="block mb-2 text-xs font-medium text-gray-600">Description</label>
                         <textarea class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full resize-none text-sm" rows="4"
                             placeholder="Description (max 255 characters)" name="description" maxlength="255">{{ old('description', $user->description) }}</textarea>

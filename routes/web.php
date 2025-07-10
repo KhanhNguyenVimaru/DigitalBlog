@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\checkValidToken;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PostController;
+
 
 // PAGE UI
 Route::get('/', function () {return view('index');})->middleware('auth');
@@ -13,7 +15,6 @@ Route::get('/page_account', function () {return view('account');})->name('accoun
 Route::get('/signup-success', function () { return view('signup_success'); });
 Route::get('/my-profile', function () { return view('myProfile');})->name('myProfile')->middleware('auth');
 Route::get('/writing', function () { return view('writing');})->name('writing')->middleware('auth');
-
 
 // LOGIN/OUT HANDLE
 Route::post('/handle_login', [AuthController::class, 'login']);
@@ -25,6 +26,10 @@ Route::patch('/update_user/{id}', [UserController::class, 'updateUserData'])->na
 Route::delete('/delete_account', [UserController::class, 'deleteUserAccount'])->name('deleteUserAccount')->middleware('auth');
 Route::middleware('auth:api')->post('/change_password', [UserController::class, 'changePassword'])->name('changePassword');
 Route::post('/update-avatar', [UserController::class, 'updateAvatar'])->middleware('auth');
+
+// API POST
+Route::post('/insert-post', [PostController::class, 'storeContent'])->name('insertPost')->middleware('auth'); 
+Route::post('/uploadFile', [PostController::class, 'uploadFile'])->name('uploadFile')->middleware('auth');
 
 // URL verify register
 Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
