@@ -9,6 +9,12 @@ Account privacy
 
 _____________________________________________________________________________________________
 Technology:
--Laravel 
--Tailwind 
--MySQL
+*Laravel
+    *Laravel passport 
+    *Laravel mail
+*JavaScript
+    *Copper.js 
+    *Sweetalert2
+    *Editor.js
+*Tailwind 
+*MySQL
