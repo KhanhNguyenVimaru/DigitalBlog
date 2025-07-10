@@ -12,6 +12,8 @@ Route::get('/page_signup', function () {return view('signup');})->name('signup')
 Route::get('/page_account', function () {return view('account');})->name('account')->middleware('auth');
 Route::get('/signup-success', function () { return view('signup_success'); });
 Route::get('/my-profile', function () { return view('myProfile');})->name('myProfile')->middleware('auth');
+Route::get('/writing', function () { return view('writing');})->name('writing')->middleware('auth');
+
 
 // LOGIN/OUT HANDLE
 Route::post('/handle_login', [AuthController::class, 'login']);

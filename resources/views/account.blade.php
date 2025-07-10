@@ -66,6 +66,23 @@
                 <form class="space-y-4" method="POST" action="{{ route('updateUserData', $user->id) }}">
                     @csrf
                     @method('PATCH')
+                    
+                    @if (session('success'))
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    
+                    @if ($errors->any())
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                            <ul class="list-disc list-inside">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    
                     <!-- Privacy -->
                     <div>
                         <label class="block mb-2 text-xs font-medium text-gray-600">Privacy</label>
@@ -82,13 +99,16 @@
                     <div>
                         <label class="block mb-2 text-xs font-medium text-gray-600">Description</label>
                         <textarea class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full resize-none text-sm" rows="4"
-                            placeholder="Description" name = "description">{{ $user->description }}</textarea>
+                            placeholder="Description (max 255 characters)" name="description" maxlength="255">{{ old('description', $user->description) }}</textarea>
+                        <div class="text-xs text-gray-500 mt-1">
+                            <span id="char-count">0</span>/255 characters
+                        </div>
                     </div>
 
                     <!-- Save settings button -->
                     <div class="flex justify-end">
                         <button type="submit"
-                            class="w-1/4 mt-[10px] text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center cursor-pointer">
+                            class="w-1/4 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center cursor-pointer h-8">
                             Save settings
                         </button>
                     </div>
@@ -116,7 +136,7 @@
                     </div>
                     <div class="flex justify-end">
                         <button type="submit"
-                            class="mt-[10px] text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center w-1/4 cursor-pointer">
+                            class="mt-[10px] text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center w-1/4 cursor-pointer h-8">
                             Change password
                         </button>
                     </div>
@@ -170,6 +190,20 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Character count for description
+            const descriptionTextarea = document.querySelector('textarea[name="description"]');
+            const charCount = document.getElementById('char-count');
+            
+            if (descriptionTextarea && charCount) {
+                // Set initial count
+                charCount.textContent = descriptionTextarea.value.length;
+                
+                // Update count on input
+                descriptionTextarea.addEventListener('input', function() {
+                    charCount.textContent = this.value.length;
+                });
+            }
+            
             const logoutForm = document.getElementById('logout-form-account');
             const deleteAccountForm = document.getElementById('delete-account-form');
             const changePasswordForm = document.getElementById('change-password-form');

@@ -13,7 +13,7 @@
             <a href="/" class="text-sm font-semibold text-gray-600 hover:text-black px-2">Feed</a>
             <a href="#" class="text-sm font-semibold text-gray-600 hover:text-black px-2">Community</a>
             <a href="/myProfile" class="text-sm font-semibold text-gray-600 hover:text-black px-2">Following</a>
-            <a href="#" class="text-sm font-semibold text-gray-600 hover:text-black px-2">Writting</a>
+            <a href="/writing" class="text-sm font-semibold text-gray-600 hover:text-black px-2">Writing</a>
             @if ($role === 'admin') 
                 <a href="/admin" class="text-sm f   ont-semibold text-gray-600 hover:text-black px-2">Admin</a>
             @endif

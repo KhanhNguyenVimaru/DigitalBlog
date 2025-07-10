@@ -28,11 +28,25 @@ class UserController extends Controller
 
     public function updateUserData(Request $request, string $id)
     {
-        $user = User::findOrFail($id);
-        $user->description = $request->description;
-        $user->privacy = $request->privacy;
-        $user->save();
-        return redirect('/page_account');
+        $request->validate([
+            'description' => 'nullable|string|max:255',
+            'privacy' => 'required|in:public,private',
+        ], [
+            'description.max' => 'Description cannot exceed 255 characters.',
+            'privacy.required' => 'Privacy setting is required.',
+            'privacy.in' => 'Privacy must be either public or private.',
+        ]);
+
+        try {
+            $user = User::findOrFail($id);
+            $user->description = $request->description;
+            $user->privacy = $request->privacy;
+            $user->save();
+            
+            return redirect('/page_account')->with('success', 'Account settings updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Failed to update account settings. Please try again.'])->withInput();
+        }
     }
 
     public function deleteUserAccount(Request $request)
