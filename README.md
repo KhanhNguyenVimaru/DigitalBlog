@@ -1,26 +1,29 @@
-Digital Blog    -    This project is currently in development. Features are being added and improved continuously.
+# Digital Blog
 
-_____________________________________________________________________________________________
+This project is currently in development.  
+Features are being added and improved continuously.
 
-Account privacy
+---
 
-- Use Laravel Passport for authenticating user accounts
-- Send a verification email with a confirmation link upon signup 
+## Account privacy
+
+- Use Laravel Passport for authenticating user accounts  
+- Send a verification email with a confirmation link upon signup  
 - Handle tokens such as access tokens, verification tokens, etc.
 
-_____________________________________________________________________________________________
+---
 
-Technology:
+## Technology:
 
-*Laravel
-    *Laravel passport 
-    *Laravel mail
+**Laravel**  
+&nbsp;&nbsp;&nbsp;&nbsp;- Laravel Passport  
+&nbsp;&nbsp;&nbsp;&nbsp;- Laravel Mail
 
-*JavaScript
-    *Copper.js 
-    *Sweetalert2
-    *Editor.js
+**JavaScript**  
+&nbsp;&nbsp;&nbsp;&nbsp;- Cropper.js  
+&nbsp;&nbsp;&nbsp;&nbsp;- SweetAlert2  
+&nbsp;&nbsp;&nbsp;&nbsp;- Editor.js
 
-*Tailwind 
+**Tailwind**
 
-*MySQL
+**MySQL**

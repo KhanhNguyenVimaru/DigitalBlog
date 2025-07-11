@@ -11,6 +11,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Account - Blog</title>
     <link rel="icon" type="image/x-icon" href="https://www.svgrepo.com/show/475713/blog.svg" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .editorjs-content p {
@@ -37,21 +38,28 @@
             font-size: 0.9rem;
             margin-left: 1rem;
         }
+
+        .post-title-hover {
+            transition: color 0.2s;
+        }
+
+        .post-title-hover:hover {
+            color: #2563eb;
+            /* blue-600 */
+        }
     </style>
 </head>
 
 <body class="bg-gray-100 min-h-screen">
     @include('header')
-    <div class="flex justify-center w-full">
+    <div class="flex justify-center w-full relative">
         <div
             class="max-w-6xl w-full mt-8 p-8 bg-white rounded-lg shadow-md flex flex-col md:flex-row items-start gap-8">
             <!-- Avatar -->
             <div class="flex flex-col items-center md:items-start w-full md:w-1/3 pl-50">
                 <img src="{{ $user->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}"
                     class="w-32 h-32 rounded-full object-cover border-2 border-gray-300 mb-4" alt="Avatar">
-
             </div>
-
 
             <!-- Info + Actions -->
             <div class="flex-1 flex flex-col items-start gap-4 w-auto">
@@ -167,18 +175,32 @@
     </div>
     <div class="w-full h-20"></div>
 
+    <!-- Spinner loading khi xóa -->
+    <div id="delete-spinner" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:999;background:rgba(255,255,255,0.7);justify-content:center;align-items:center;">
+      <div class="spinner" style="border: 6px solid #f3f3f3; border-top: 6px solid #2563eb; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+    </div>
+    <style>
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    </style>
+
     <script>
         function openModal(id) {
             const modal = document.getElementById(id);
             const panel = document.getElementById(id + '-panel');
+            if (!modal) return;
             modal.classList.remove('pointer-events-none', 'opacity-0');
             modal.classList.add('opacity-100');
             setTimeout(() => {
-                panel.classList.remove('opacity-0', 'scale-95', 'translate-y-4');
-                panel.classList.add('opacity-100', 'scale-100', 'translate-y-0');
+                if (panel) {
+                    panel.classList.remove('opacity-0', 'scale-95', 'translate-y-4');
+                    panel.classList.add('opacity-100', 'scale-100', 'translate-y-0');
+                }
             }, 10);
             modal.addEventListener('mousedown', function handler(e) {
-                if (!panel.contains(e.target)) {
+                if (panel && !panel.contains(e.target)) {
                     closeModal(id);
                     modal.removeEventListener('mousedown', handler);
                 }
@@ -239,137 +261,184 @@
 
                         // Tạo khung bài viết
                         const postDiv = document.createElement('div');
-                        postDiv.className = 'bg-white rounded-lg shadow p-4 flex flex-col';
-                        postDiv.style.minHeight = '200px';
-                        postDiv.style.maxHeight = '350px';
+                        postDiv.className = 'bg-white rounded-lg shadow p-4 flex flex-col relative';
+                        postDiv.style.minHeight = '100px';
+                        postDiv.style.maxHeight = '180px';
                         postDiv.style.overflow = 'hidden';
 
-                        // Tạo id duy nhất cho content
-                        const contentId = `post-content-${post.id}`;
-                        const expandBtnId = `expand-btn-${post.id}`;
+                        // Tạo id duy nhất cho modal và button
+                        const modalId = `modal-post-actions-${post.id}`;
+                        const modalPanelId = `modal-post-actions-panel-${post.id}`;
+                        const btnId = `post-actions-btn-${post.id}`;
 
-                        // Header bài viết
+                        // Header bài viết chỉ còn title và nút actions
                         postDiv.innerHTML = `
-                        <div class="flex flex-row items-center mb-2">
-                            <a href="/my-profile" class="text-blue-700 font-semibold hover:underline text-sm">${post.author && post.author.name ? post.author.name : (window.userName || 'You')}</a>
-                            <div class="flex flex-row items-center gap-2 ml-auto">
-                                <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">${categoryName}</span>
-                                <span class="px-2 py-1 rounded text-xs ${post.status === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'}">${status}</span>
-                                <span class="text-xs text-gray-400 ml-2">${createdAt}</span>
+                        <div class="flex flex-row items-center mb-2 justify-between">
+                            <div class="font-bold text-base text-gray-800 cursor-pointer post-title-hover">${post.title || 'lỗi gì đó'}</div>
+                            <div class="relative cursor-pointer">
+                                <button id="${btnId}" class="p-2 rounded-full hover:bg-gray-200 focus:outline-none cursor-pointer" title="Actions" type="button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-500 cursor-pointer">
+                                        <path cursor-pointer stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0 7.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0 7.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" />
+                                    </svg>
+                                </button>
+                                <div id="dropdown-${post.id}" class="hidden absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-50 cursor-pointer z-index-99">
+                                    <button type="button" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-gray-800 change-status-btn cursor-pointer" data-post-id="${post.id}" data-current-status="${post.status}">
+                                        Set status: ${post.status === 'public' ? 'Private' : 'Public'}
+                                    </button>
+                                    <button type="button" class="w-full text-left px-4 py-2 text-sm hover:bg-red-100 text-red-600 delete-post-btn cursor-pointer" data-post-id="${post.id}">
+                                        Delete post
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <div class="font-extrabold text-xl text-gray-800 mb-2">${post.title || 'lỗi gì đó'}</div>
-                        <div id="${contentId}" class="editorjs-content relative transition-all duration-300 flex-1" style="max-height: 120px; overflow: hidden;"></div>
-                        <div class='mt-auto flex justify-center'><a href="/post/${post.id}" class="mt-2 text-blue-600 hover:underline text-sm">Read more</a></div>
-                    `;
+                        <div class="flex flex-row items-center gap-2 mb-2 cursor-pointer">
+                            <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold cursor-pointer">${categoryName}</span>
+                            <span class="px-2 py-1 rounded text-xs ${post.status === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'} cursor-pointer">${status}</span>
+                        </div>
+                        <div class="text-xs text-gray-400 mt-auto cursor-pointer">${createdAt}</div>
+                        `;
 
                         postsList.appendChild(postDiv);
 
-                        // Render nội dung EditorJS
-                        let contentData = null;
-                        try {
-                            contentData = typeof post.content === 'string' ? JSON.parse(post.content) :
-                                post.content;
-                        } catch (e) {
-                            contentData = null;
-                        }
-                        if (contentData && contentData.blocks) {
-                            renderEditorJSContent(contentId, contentData, expandBtnId, 120, postDiv);
-                        } else {
-                            document.getElementById(contentId).innerHTML =
-                                '<div class="text-gray-400 italic">No content</div>';
-                        }
+                        // Sự kiện mở dropdown cho từng post
+                        setTimeout(() => {
+                            const btn = document.getElementById(btnId);
+                            const dropdown = document.getElementById(`dropdown-${post.id}`);
+                            if (btn && dropdown) {
+                                btn.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    // Đóng tất cả dropdown khác
+                                    document.querySelectorAll('[id^="dropdown-"]')
+                                        .forEach(el => {
+                                            if (el !== dropdown) el.classList.add(
+                                                'hidden');
+                                        });
+                                    dropdown.classList.toggle('hidden');
+                                });
+                                // Đóng dropdown khi click ra ngoài
+                                document.addEventListener('mousedown', function handler(event) {
+                                    if (!btn.contains(event.target) && !dropdown
+                                        .contains(event.target)) {
+                                        dropdown.classList.add('hidden');
+                                    }
+                                });
+                            }
+                            // Sự kiện đổi status
+                            const statusBtn = dropdown.querySelector('.change-status-btn');
+                            if (statusBtn) {
+                                statusBtn.addEventListener('click', function() {
+                                    const postId = this.getAttribute('data-post-id');
+                                    if (!postId) return;
+                                    fetch(`/update-status/${postId}`, {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'X-Requested-With': 'XMLHttpRequest',
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                            'Accept': 'application/json'
+                                        }
+                                    })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Updated!',
+                                                text: data.message || 'Status updated.',
+                                                showConfirmButton: false,
+                                                timer: 1000
+                                            }).then(() => {
+                                                location.reload();
+                                            });
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Error!',
+                                                text: data.message || 'Update failed!'
+                                            });
+                                        }
+                                    })
+                                    .catch(() => {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error!',
+                                            text: 'Update failed!'
+                                        });
+                                    });
+                                    dropdown.classList.add('hidden');
+                                });
+                            }
+                            // Sự kiện xóa post
+                            const deleteBtn = dropdown.querySelector('.delete-post-btn');
+                            if (deleteBtn) {
+                                deleteBtn.addEventListener('click', function() {
+                                    // Gửi SweetAlert xác nhận xóa
+                                    const postId = this.getAttribute('data-post-id');
+                                    if (!postId) return;
+                                    Swal.fire({
+                                        title: 'Are you sure?',
+                                        text: 'This action cannot be undone!',
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#d33',
+                                        cancelButtonColor: '#3085d6',
+                                        confirmButtonText: 'Yes, delete it!'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            fetch(`/delete-post/${postId}`, {
+                                                    method: 'DELETE',
+                                                    headers: {
+                                                        'X-Requested-With': 'XMLHttpRequest',
+                                                        'X-CSRF-TOKEN': document
+                                                            .querySelector(
+                                                                'meta[name="csrf-token"]'
+                                                                )
+                                                            .getAttribute(
+                                                                'content'),
+                                                        'Accept': 'application/json'
+                                                    }
+                                                })
+                                                .then(res => res.json())
+                                                .then(data => {
+                                                    if (data.success) {
+                                                        Swal.fire({
+                                                            icon: 'success',
+                                                            title: 'Deleted!',
+                                                            text: data.message || 'Post has been deleted.',
+                                                            showConfirmButton: false,
+                                                            timer: 1000
+                                                        }).then(() => {
+                                                            location.reload();
+                                                        });
+                                                    } else {
+                                                        Swal.fire({
+                                                            icon: 'error',
+                                                            title: 'Error!',
+                                                            text: data
+                                                                .message ||
+                                                                'Delete failed!'
+                                                        });
+                                                    }
+                                                })
+                                                .catch(() => {
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: 'Error!',
+                                                        text: 'Delete failed!'
+                                                    });
+                                                });
+                                        }
+                                    });
+                                    dropdown.classList.add('hidden');
+                                });
+                            }
+                        }, 0);
                     });
                 });
 
-            function renderEditorJSContent(holderId, data, expandBtnId, maxHeight = 120, postDiv = null) {
-                const holder = document.getElementById(holderId);
-                if (!holder) return;
-                let html = '';
-                data.blocks.forEach(block => {
-                    switch (block.type) {
-                        case 'header':
-                            html +=
-                                `<h${block.data.level} class="font-bold mt-2 mb-1">${block.data.text}</h${block.data.level}>`;
-                            break;
-                        case 'paragraph':
-                            html += `<p class="mb-2">${block.data.text}</p>`;
-                            break;
-                        case 'list':
-                            if (block.data.style === 'ordered') {
-                                html += '<ol class="list-decimal ml-6">';
-                                block.data.items.forEach(item => html += `<li>${item}</li>`);
-                                html += '</ol>';
-                            } else {
-                                html += '<ul class="list-disc ml-6">';
-                                block.data.items.forEach(item => html += `<li>${item}</li>`);
-                                html += '</ul>';
-                            }
-                            break;
-                        case 'image':
-                            html +=
-                                `<img src="${block.data.file.url}" alt="" class="my-2 rounded max-w-full">`;
-                            break;
-                        case 'quote':
-                            html +=
-                                `<blockquote class="border-l-4 border-blue-400 pl-4 italic text-gray-600 my-2">${block.data.text}<br><span class="block text-xs text-gray-400 mt-1">${block.data.caption || ''}</span></blockquote>`;
-                            break;
-                        case 'checklist':
-                            html += '<ul class="ml-6">';
-                            block.data.items.forEach(item => {
-                                html +=
-                                    `<li><input type="checkbox" disabled ${item.checked ? 'checked' : ''}> ${item.text}</li>`;
-                            });
-                            html += '</ul>';
-                            break;
-                        case 'raw':
-                            html +=
-                                `<pre class="bg-gray-100 rounded p-2 overflow-x-auto">${block.data.html}</pre>`;
-                            break;
-                        case 'simpleImage':
-                            html += `<img src="${block.data.url}" alt="" class="my-2 rounded max-w-full">`;
-                            break;
-                        default:
-                            break;
-                    }
-                });
-                holder.innerHTML = html;
-
-                // Kiểm tra nếu nội dung vượt quá max-height thì hiện nút "Show more"
-                setTimeout(() => {
-                    if (holder.scrollHeight > maxHeight) {
-                        const btn = document.getElementById(expandBtnId);
-                        if (btn) {
-                            btn.classList.remove('hidden');
-                            let expanded = false;
-                            btn.addEventListener('click', function(e) {
-                                e.preventDefault();
-                                expanded = !expanded;
-                                if (expanded) {
-                                    holder.style.maxHeight = 'none';
-                                    holder.style.overflow = 'visible';
-                                    btn.textContent = 'Show less';
-                                    if (postDiv) {
-                                        postDiv.style.maxHeight = 'none';
-                                        postDiv.style.overflow = 'visible';
-                                    }
-                                } else {
-                                    holder.style.maxHeight = maxHeight + 'px';
-                                    holder.style.overflow = 'hidden';
-                                    btn.textContent = 'Show more';
-                                    if (postDiv) {
-                                        postDiv.style.maxHeight = '350px';
-                                        postDiv.style.overflow = 'hidden';
-                                    }
-                                }
-                            });
-                        }
-                    }
-                }, 100);
-            }
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.30.8/dist/editorjs.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 
 </html>

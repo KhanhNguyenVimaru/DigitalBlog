@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
+    public function updateStatus($id){
+        $post = post::findOrFail($id);
+        if ($post->authorId !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $post->status = $post->status === 'public' ? 'private' : 'public';
+        $post->save();
+
+        return response()->json(['success' => true, 'message' => 'Post status updated successfully', 'status' => $post->status], 200);
+    }
     /**
      * Display a listing of the resource.
      */
