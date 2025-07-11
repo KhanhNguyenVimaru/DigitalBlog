@@ -17,6 +17,15 @@ class CategoryController extends Controller
     }
 
     /**
+     * Get all categories for select dropdown
+     */
+    public function getAllCategories()
+    {
+        $categories = category::all();
+        return response()->json($categories);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

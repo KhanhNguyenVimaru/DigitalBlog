@@ -15,4 +15,14 @@ class post extends Model
      * @var array<string>|bool
      */
     protected $guarded = [];
+
+    public function category()
+    {
+        return $this->belongsTo(\App\Models\category::class, 'categoryId');
+    }
+
+    public function long_content()
+    {
+        return $this->hasMany(\App\Models\long_content::class, 'postId');
+    }
 }

@@ -14,8 +14,8 @@
             border: 1px solid #d1d5db;
             border-radius: 0.375rem;
             background: white;
+            min-height: 100vh;
             width: 100%;
-            aspect-ratio: 1.414 / 1;
             max-width: 800px;
             margin: 0 auto;
         }
@@ -30,6 +30,20 @@
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -51,9 +65,15 @@
                         </select>
                     </div>
                     <div class="flex-1 pl-2">
-                        <label class="block mb-2 text-sm font-medium text-gray-700">Attachment (optional)</label>
-                        <input id="additionFile" type="file" name="additionFile" class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                        <label class="block mb-2 text-sm font-medium text-gray-700">Category</label>
+                        <select id="categoryId" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" name="categoryId">
+                            <option value="">Select a category (optional)</option>
+                        </select>
                     </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Attachment (optional)</label>
+                    <input id="additionFile" type="file" name="additionFile" class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
                 </div>
                 <div class="editor-container">
                     <div id="editorjs"></div>
@@ -64,27 +84,56 @@
 
             <div class="flex justify-end m-4 cursor-pointer">
                 <button id="post-btn" data-url="{{route('insertPost')}}" type="button" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded shadow transition inline-block text-center">Post</button>
-            </div> 
+            </div>
+            <div id="spinner" class="spinner"></div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const postBtn = document.getElementById('post-btn');
             const editorElement = document.getElementById('editorjs');
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const categorySelect = document.getElementById('categoryId');
+
+            // Load categories
+            fetch('/categories', {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(categories => {
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.content;
+                    categorySelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading categories:', error);
+            });
 
             postBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const title = document.getElementById('title').value;
                 const status = document.getElementById('status').value;
+                const categoryId = document.getElementById('categoryId').value;
                 const additionFile = document.getElementById('additionFile').files[0];
-                
+                const spinner = document.getElementById('spinner');
+                spinner.style.display = 'block';
                 // Lấy content từ EditorJS
                 editor.save().then((outputData) => {
                     const formData = new FormData();
                     formData.append('title', title);
                     formData.append('content', JSON.stringify(outputData));
                     formData.append('status', status);
+                    if (categoryId) {
+                        formData.append('categoryId', categoryId);
+                    }
                     if (additionFile) {
                         formData.append('additionFile', additionFile);
                     }
@@ -96,15 +145,47 @@
                         },
                         body: formData
                     })
-                    .then(response => response.json())
-                    .then(data => {
+                    .then(async response => {
+                        const data = await response.json();
+                        spinner.style.display = 'none';
+                        if(response.status === 400) {
+                            // Xóa toàn bộ input
+                            document.getElementById('title').value = '';
+                            document.getElementById('status').selectedIndex = 0;
+                            document.getElementById('categoryId').selectedIndex = 0;
+                            document.getElementById('additionFile').value = '';
+                            if(window.editor) {
+                                window.editor.clear();
+                            }
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.message || 'An error occurred, please try again.',
+                            });
+                            return;
+                        }
                         if(data.success){
                             window.location.href = '/';
                         } else {
                             alert(data.message || 'Post failed!');
                         }
                     })
-                    .catch(() => alert('Post failed!'));
+                    .catch(() => {
+                        spinner.style.display = 'none';
+                        // Xóa toàn bộ input
+                        document.getElementById('title').value = '';
+                        document.getElementById('status').selectedIndex = 0;
+                        document.getElementById('categoryId').selectedIndex = 0;
+                        document.getElementById('additionFile').value = '';
+                        if(window.editor) {
+                            window.editor.clear();
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'An error occurred, please try again.',
+                        });
+                    });
                 });
             });
         });

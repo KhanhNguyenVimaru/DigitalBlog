@@ -35,10 +35,13 @@ class PostController extends Controller
     public function storeContent(Request $request)
     {
         $validated = $request->validate([
+            'title' => 'required|string|max:255',
             'status' => 'required|in:public,private',
             'categoryId' => 'nullable|exists:categories,id',
             'groupId' => 'nullable|exists:groups,id',
             'content' => 'required|string',
+            'additionFile' => 'nullable|max:2048', // Tối đa 2MB
+            'additionFile.*' => 'file|mimes:jpeg,png,jpg,webp,pdf,doc,docx,xls,xlsx,txt' // Các định dạng cho phép
         ]);
 
         $userId = Auth::id();
@@ -50,11 +53,20 @@ class PostController extends Controller
         DB::beginTransaction();
 
         try {
+            // biến file bổ sung
+            if ($request->hasFile('additionFile')) {
+                $file = $request->file('additionFile');
+                $path = $file->store('uploads', 'public');
+                $validated['additionFile'] = Storage::url($path); // Lưu đường dẫn
+            }
+
             $post = new Post();
+            $post->title = $validated['title'];
             $post->status = $validated['status'];
             $post->categoryId = $validated['categoryId'] ?? null;
             $post->groupId = $validated['groupId'] ?? null;
             $post->authorId = $userId;
+            $post->additionFile = $validated['additionFile'] ?? null;
 
             // Nếu content <= 65535 bytes ➝ lưu vào posts.content
             if ($contentSize <= 65535) {
@@ -78,6 +90,16 @@ class PostController extends Controller
             DB::rollBack();
             return response()->json(['error' => 'Failed to create post', 'message' => $e->getMessage()], 500);
         }
+    }
+
+    public function contentOfUsers(Request $request){
+        $userId = Auth::id();
+        $posts = post::where('authorId', $userId)
+            ->with(['category', 'long_content'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($posts);
     }
 
     public function index()

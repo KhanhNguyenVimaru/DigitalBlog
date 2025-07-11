@@ -33,7 +33,7 @@ const editor = new EditorJS({
       config: {
         endpoints: {
           byFile: '/uploadFile',
-          byUrl: '/uploadFile', // Chỉ cần một endpoint, Laravel sẽ tự động xử lý
+          // byUrl: '/uploadFile', // Chỉ cần một endpoint, Laravel sẽ tự động xử lý
         },
         additionalRequestData: {
           '_token': meta.content, // Laravel sẽ nhận đúng CSRF token

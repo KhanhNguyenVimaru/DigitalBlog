@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Content;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -42,7 +43,7 @@ class UserController extends Controller
             $user->description = $request->description;
             $user->privacy = $request->privacy;
             $user->save();
-            
+
             return redirect('/page_account')->with('success', 'Account settings updated successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Failed to update account settings. Please try again.'])->withInput();
@@ -54,6 +55,10 @@ class UserController extends Controller
         try {
             $user = Auth::user();
             $user->tokens->each->revoke();
+            if ($user->avatar_path && Storage::disk('public')->exists($user->avatar_path)) {
+                Storage::disk('public')->delete($user->avatar_path);
+            }
+
             $user->delete();
 
             return response()->json([
