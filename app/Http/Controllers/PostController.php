@@ -16,6 +16,28 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function deletePost($id)
+    {
+        $post = post::findOrFail($id);
+        if ($post->authorId !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }                           
+        DB::beginTransaction();
+        try {
+            // Xóa nội dung dài nếu có
+            if ($post->long_content()->exists()) {
+                $post->long_content()->delete();
+            }   
+            // Xóa bài viết
+            $post->delete();
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Post deleted successfully'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to delete post', 'message' => $e->getMessage()], 500);
+        }
+    }
+
     public function uploadFile(Request $request)
     {
         $request->validate([
@@ -85,10 +107,18 @@ class PostController extends Controller
 
             DB::commit();
 
-            return response()->json(['message' => 'Post created successfully', 'postId' => $post->id], 201);
+            return response()->json([
+                'success' => true,
+                'message' => 'Post created successfully',
+                'postId' => $post->id
+            ], 201);
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Failed to create post', 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to create post',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 

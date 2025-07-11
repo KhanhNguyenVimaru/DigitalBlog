@@ -29,6 +29,7 @@ Route::post('/update-avatar', [UserController::class, 'updateAvatar'])->middlewa
 Route::post('/insert-post', [PostController::class, 'storeContent'])->name('insertPost')->middleware('auth'); 
 Route::post('/uploadFile', [PostController::class, 'uploadFile'])->name('uploadFile')->middleware('auth');
 Route::get('/content-of-users', [PostController::class, 'contentOfUsers'])->name('contentOfUsers')->middleware('auth');
+Route::delete('/delete-post/{id}', [PostController::class, 'deletePost'])->name('deletePost')->middleware('auth');
 // API CATEGORY
 Route::get('/categories', [CategoryController::class, 'getAllCategories'])->name('getAllCategories')->middleware('auth');
 // URL verify register

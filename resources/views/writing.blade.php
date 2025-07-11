@@ -31,20 +31,6 @@
             max-width: 800px;
             margin: 0 auto;
         }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-            display: none;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 
@@ -85,7 +71,6 @@
             <div class="flex justify-end m-4 cursor-pointer">
                 <button id="post-btn" data-url="{{route('insertPost')}}" type="button" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded shadow transition inline-block text-center">Post</button>
             </div>
-            <div id="spinner" class="spinner"></div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -123,8 +108,6 @@
                 const status = document.getElementById('status').value;
                 const categoryId = document.getElementById('categoryId').value;
                 const additionFile = document.getElementById('additionFile').files[0];
-                const spinner = document.getElementById('spinner');
-                spinner.style.display = 'block';
                 // Lấy content từ EditorJS
                 editor.save().then((outputData) => {
                     const formData = new FormData();
@@ -147,9 +130,8 @@
                     })
                     .then(async response => {
                         const data = await response.json();
-                        spinner.style.display = 'none';
-                        if(response.status === 400) {
-                            // Xóa toàn bộ input
+                        if(data.success){
+                            // Xóa toàn bộ input và EditorJS
                             document.getElementById('title').value = '';
                             document.getElementById('status').selectedIndex = 0;
                             document.getElementById('categoryId').selectedIndex = 0;
@@ -158,20 +140,19 @@
                                 window.editor.clear();
                             }
                             Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: data.message || 'Post created successfully!'
+                            });
+                        } else {
+                            Swal.fire({
                                 icon: 'error',
                                 title: 'Error!',
-                                text: data.message || 'An error occurred, please try again.',
+                                text: data.message || 'Post failed!'
                             });
-                            return;
-                        }
-                        if(data.success){
-                            window.location.href = '/';
-                        } else {
-                            alert(data.message || 'Post failed!');
                         }
                     })
                     .catch(() => {
-                        spinner.style.display = 'none';
                         // Xóa toàn bộ input
                         document.getElementById('title').value = '';
                         document.getElementById('status').selectedIndex = 0;
@@ -183,7 +164,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Error!',
-                            text: 'An error occurred, please try again.',
+                            text: 'An error occurred, please try again.'
                         });
                     });
                 });

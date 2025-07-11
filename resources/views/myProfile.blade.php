@@ -12,39 +12,71 @@
     <title>Account - Blog</title>
     <link rel="icon" type="image/x-icon" href="https://www.svgrepo.com/show/475713/blog.svg" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        .editorjs-content p {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 0.5rem;
+        }
+
+        .editorjs-content h1,
+        .editorjs-content h2,
+        .editorjs-content h3 {
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .editorjs-content img {
+            max-height: 100px;
+            object-fit: cover;
+        }
+
+        .editorjs-content ul,
+        .editorjs-content ol {
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100 min-h-screen">
     @include('header')
     <div class="flex justify-center w-full">
-        <div class="max-w-4xl w-full mt-8 p-8 bg-white rounded-lg shadow-md flex flex-col md:flex-row items-start gap-8">
+        <div
+            class="max-w-6xl w-full mt-8 p-8 bg-white rounded-lg shadow-md flex flex-col md:flex-row items-start gap-8">
             <!-- Avatar -->
-            <div class="flex flex-col items-center md:items-start w-full md:w-1/3 pl-30">
+            <div class="flex flex-col items-center md:items-start w-full md:w-1/3 pl-50">
                 <img src="{{ $user->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}"
                     class="w-32 h-32 rounded-full object-cover border-2 border-gray-300 mb-4" alt="Avatar">
+
             </div>
+
+
             <!-- Info + Actions -->
-            <div class="flex-1 flex flex-col items-start gap-4 w-auto pl-5">
-                <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 w-auto">
+            <div class="flex-1 flex flex-col items-start gap-4 w-auto">
+                <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 w-auto ml-12">
                     <div class="flex flex-col items-center md:items-start">
                         <h2 class="text-2xl font-bold">{{ $user->name }}</h2>
                         <span class="text-gray-500 text-base">{{ $user->email }}</span>
                     </div>
                     @if ($user->privacy === 'public')
-                        <span class="px-3 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700" style="cursor: pointer;">{{ $user->privacy }}</span>
+                        <span class="px-3 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700"
+                            style="cursor: pointer;">{{ $user->privacy }}</span>
                     @else
-                        <span class="px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700" style="cursor: pointer;">{{ $user->privacy }}</span>
+                        <span class="px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700"
+                            style="cursor: pointer;">{{ $user->privacy }}</span>
                     @endif
-                    <a href="{{ route('account') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-1 rounded transition text-sm">Edit profile</a>
+                    <a href="{{ route('account') }}"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-1 rounded transition text-sm">Edit
+                        profile</a>
                 </div>
-                @if ($user->description)
-                    <div class="text-gray-600 text-base text-center md:text-left">{{ $user->description }}</div>
-                @endif
+
                 <!-- Follower/Following/Posts row -->
-                <div class="flex flex-row justify-start gap-12 mt-2 w-auto">
+                <div class="flex flex-row justify-start gap-12 mt-2 w-auto ml-12">
                     <div class="flex flex-row gap-8">
                         <div class="text-center">
-                            <div class="text-lg font-bold text-gray-800">0</div>
+                            <div class="text-lg font-bold text-gray-800"><span class="js-posts-count">0</span></div>
                             <div class="text-xs text-gray-500 uppercase tracking-wide">Posts</div>
                         </div>
                         <a href="#" id="followers-link" class="text-center">
@@ -128,9 +160,10 @@
     </div>
 
     <!-- Danh sách bài viết của user -->
-    <div id="user-posts" class="max-w-4xl mx-auto mt-8">
+    <div id="user-posts" class="max-w-6xl mx-auto mt-8">
         <h3 class="text-xl font-bold mb-4 text-gray-800">My Posts</h3>
-        <div id="posts-list" class="w-11/12 md:w-9/10 mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 justify-between"></div>
+        <div id="posts-list" class="w-11/12 md:w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 justify-between">
+        </div>
     </div>
     <div class="w-full h-20"></div>
 
@@ -144,7 +177,6 @@
                 panel.classList.remove('opacity-0', 'scale-95', 'translate-y-4');
                 panel.classList.add('opacity-100', 'scale-100', 'translate-y-0');
             }, 10);
-            // Đóng modal khi click ra ngoài panel
             modal.addEventListener('mousedown', function handler(e) {
                 if (!panel.contains(e.target)) {
                     closeModal(id);
@@ -163,6 +195,7 @@
                 modal.classList.add('opacity-0', 'pointer-events-none');
             }, 200);
         }
+
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('followers-link').addEventListener('click', function(e) {
                 e.preventDefault();
@@ -179,12 +212,6 @@
                     openModal('modal-privacy');
                 });
             }
-        });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.30.8/dist/editorjs.umd.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // ... các script modal cũ ...
 
             // Lấy bài viết của user
             fetch('/content-of-users', {
@@ -197,6 +224,10 @@
                 .then(res => res.json())
                 .then(posts => {
                     const postsList = document.getElementById('posts-list');
+                    // Hiển thị số lượng post lên mục Posts
+                    const postsCount = posts.length;
+                    const postsCountEls = document.querySelectorAll('.js-posts-count');
+                    postsCountEls.forEach(el => el.textContent = postsCount);
                     if (!posts.length) {
                         postsList.innerHTML = '<div class="text-gray-500">No posts yet.</div>';
                         return;
@@ -206,134 +237,139 @@
                         let status = post.status.charAt(0).toUpperCase() + post.status.slice(1);
                         let createdAt = new Date(post.created_at).toLocaleString();
 
-                        // Tạo khung bài viết hình vuông
+                        // Tạo khung bài viết
                         const postDiv = document.createElement('div');
-                        postDiv.className = 'bg-white rounded-lg shadow p-6 flex flex-col';
-                        postDiv.style.aspectRatio = '1/1';
-                        postDiv.style.minHeight = '250px';
-                        postDiv.style.maxHeight = '400px';
+                        postDiv.className = 'bg-white rounded-lg shadow p-4 flex flex-col';
+                        postDiv.style.minHeight = '200px';
+                        postDiv.style.maxHeight = '350px';
                         postDiv.style.overflow = 'hidden';
 
                         // Tạo id duy nhất cho content
                         const contentId = `post-content-${post.id}`;
                         const expandBtnId = `expand-btn-${post.id}`;
 
-                        // Header bài viết mới: user, category, status, time
+                        // Header bài viết
                         postDiv.innerHTML = `
-                            <div class="flex flex-row items-center mb-2">
-                                <a href="/my-profile" class="text-blue-700 font-semibold hover:underline text-sm">${post.author && post.author.name ? post.author.name : (window.userName || 'You')}</a>
-                                <div class="flex flex-row items-center gap-2 ml-auto">
-                                    <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">${categoryName}</span>
-                                    <span class="px-2 py-1 rounded text-xs ${post.status === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'}">${status}</span>
-                                    <span class="text-xs text-gray-400 ml-2">${createdAt}</span>
-                                </div>
+                        <div class="flex flex-row items-center mb-2">
+                            <a href="/my-profile" class="text-blue-700 font-semibold hover:underline text-sm">${post.author && post.author.name ? post.author.name : (window.userName || 'You')}</a>
+                            <div class="flex flex-row items-center gap-2 ml-auto">
+                                <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">${categoryName}</span>
+                                <span class="px-2 py-1 rounded text-xs ${post.status === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'}">${status}</span>
+                                <span class="text-xs text-gray-400 ml-2">${createdAt}</span>
                             </div>
-                            <div class="font-extrabold text-2xl text-gray-800 mb-2">${post.title || 'lỗi gì đó'}</div>
-                            <div id="${contentId}" class="editorjs-content relative transition-all duration-300 flex-1" style="max-height: 150px; overflow: hidden;"></div>
-                            <div class='mt-auto flex justify-center'><a href="/post/${post.id}" class="mt-2 text-blue-600 hover:underline text-sm">Show more</a></div>
-                        `;
+                        </div>
+                        <div class="font-extrabold text-xl text-gray-800 mb-2">${post.title || 'lỗi gì đó'}</div>
+                        <div id="${contentId}" class="editorjs-content relative transition-all duration-300 flex-1" style="max-height: 120px; overflow: hidden;"></div>
+                        <div class='mt-auto flex justify-center'><a href="/post/${post.id}" class="mt-2 text-blue-600 hover:underline text-sm">Read more</a></div>
+                    `;
 
                         postsList.appendChild(postDiv);
 
                         // Render nội dung EditorJS
                         let contentData = null;
                         try {
-                            contentData = typeof post.content === 'string' ? JSON.parse(post.content) : post.content;
+                            contentData = typeof post.content === 'string' ? JSON.parse(post.content) :
+                                post.content;
                         } catch (e) {
                             contentData = null;
                         }
                         if (contentData && contentData.blocks) {
-                            renderEditorJSContent(contentId, contentData, expandBtnId, 150, postDiv);
+                            renderEditorJSContent(contentId, contentData, expandBtnId, 120, postDiv);
                         } else {
-                            document.getElementById(contentId).innerHTML = '<div class="text-gray-400 italic">No content</div>';
+                            document.getElementById(contentId).innerHTML =
+                                '<div class="text-gray-400 italic">No content</div>';
                         }
                     });
                 });
 
-        // Sửa hàm renderEditorJSContent để nhận maxHeight động
-        function renderEditorJSContent(holderId, data, expandBtnId, maxHeight = 150, postDiv = null) {
-            const holder = document.getElementById(holderId);
-            if (!holder) return;
-            let html = '';
-            data.blocks.forEach(block => {
-                switch (block.type) {
-                    case 'header':
-                        html += `<h${block.data.level} class="font-bold mt-2 mb-1">${block.data.text}</h${block.data.level}>`;
-                        break;
-                    case 'paragraph':
-                        html += `<p class="mb-2">${block.data.text}</p>`;
-                        break;
-                    case 'list':
-                        if (block.data.style === 'ordered') {
-                            html += '<ol class="list-decimal ml-6">';
-                            block.data.items.forEach(item => html += `<li>${item}</li>`);
-                            html += '</ol>';
-                        } else {
-                            html += '<ul class="list-disc ml-6">';
-                            block.data.items.forEach(item => html += `<li>${item}</li>`);
-                            html += '</ul>';
-                        }
-                        break;
-                    case 'image':
-                        html += `<img src="${block.data.file.url}" alt="" class="my-2 rounded max-w-full">`;
-                        break;
-                    case 'quote':
-                        html += `<blockquote class="border-l-4 border-blue-400 pl-4 italic text-gray-600 my-2">${block.data.text}<br><span class="block text-xs text-gray-400 mt-1">${block.data.caption || ''}</span></blockquote>`;
-                        break;
-                    case 'checklist':
-                        html += '<ul class="ml-6">';
-                        block.data.items.forEach(item => {
-                            html += `<li><input type="checkbox" disabled ${item.checked ? 'checked' : ''}> ${item.text}</li>`;
-                        });
-                        html += '</ul>';
-                        break;
-                    case 'raw':
-                        html += `<pre class="bg-gray-100 rounded p-2 overflow-x-auto">${block.data.html}</pre>`;
-                        break;
-                    case 'simpleImage':
-                        html += `<img src="${block.data.url}" alt="" class="my-2 rounded max-w-full">`;
-                        break;
-                    default:
-                        break;
-                }
-            });
-            holder.innerHTML = html;
-
-            // Kiểm tra nếu nội dung vượt quá max-height thì hiện nút "Show more"
-            setTimeout(() => {
-                if (holder.scrollHeight > maxHeight) {
-                    const btn = document.getElementById(expandBtnId);
-                    if (btn) {
-                        btn.classList.remove('hidden');
-                        let expanded = false;
-                        btn.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            expanded = !expanded;
-                            if (expanded) {
-                                holder.style.maxHeight = 'none';
-                                holder.style.overflow = 'visible';
-                                btn.textContent = 'Show less';
-                                if (postDiv) {
-                                    postDiv.style.maxHeight = 'none';
-                                    postDiv.style.overflow = 'visible';
-                                }
+            function renderEditorJSContent(holderId, data, expandBtnId, maxHeight = 120, postDiv = null) {
+                const holder = document.getElementById(holderId);
+                if (!holder) return;
+                let html = '';
+                data.blocks.forEach(block => {
+                    switch (block.type) {
+                        case 'header':
+                            html +=
+                                `<h${block.data.level} class="font-bold mt-2 mb-1">${block.data.text}</h${block.data.level}>`;
+                            break;
+                        case 'paragraph':
+                            html += `<p class="mb-2">${block.data.text}</p>`;
+                            break;
+                        case 'list':
+                            if (block.data.style === 'ordered') {
+                                html += '<ol class="list-decimal ml-6">';
+                                block.data.items.forEach(item => html += `<li>${item}</li>`);
+                                html += '</ol>';
                             } else {
-                                holder.style.maxHeight = maxHeight + 'px';
-                                holder.style.overflow = 'hidden';
-                                btn.textContent = 'Show more';
-                                if (postDiv) {
-                                    postDiv.style.maxHeight = '400px';
-                                    postDiv.style.overflow = 'hidden';
-                                }
+                                html += '<ul class="list-disc ml-6">';
+                                block.data.items.forEach(item => html += `<li>${item}</li>`);
+                                html += '</ul>';
                             }
-                        });
+                            break;
+                        case 'image':
+                            html +=
+                                `<img src="${block.data.file.url}" alt="" class="my-2 rounded max-w-full">`;
+                            break;
+                        case 'quote':
+                            html +=
+                                `<blockquote class="border-l-4 border-blue-400 pl-4 italic text-gray-600 my-2">${block.data.text}<br><span class="block text-xs text-gray-400 mt-1">${block.data.caption || ''}</span></blockquote>`;
+                            break;
+                        case 'checklist':
+                            html += '<ul class="ml-6">';
+                            block.data.items.forEach(item => {
+                                html +=
+                                    `<li><input type="checkbox" disabled ${item.checked ? 'checked' : ''}> ${item.text}</li>`;
+                            });
+                            html += '</ul>';
+                            break;
+                        case 'raw':
+                            html +=
+                                `<pre class="bg-gray-100 rounded p-2 overflow-x-auto">${block.data.html}</pre>`;
+                            break;
+                        case 'simpleImage':
+                            html += `<img src="${block.data.url}" alt="" class="my-2 rounded max-w-full">`;
+                            break;
+                        default:
+                            break;
                     }
-                }
-            }, 100);
-        }
+                });
+                holder.innerHTML = html;
 
+                // Kiểm tra nếu nội dung vượt quá max-height thì hiện nút "Show more"
+                setTimeout(() => {
+                    if (holder.scrollHeight > maxHeight) {
+                        const btn = document.getElementById(expandBtnId);
+                        if (btn) {
+                            btn.classList.remove('hidden');
+                            let expanded = false;
+                            btn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                expanded = !expanded;
+                                if (expanded) {
+                                    holder.style.maxHeight = 'none';
+                                    holder.style.overflow = 'visible';
+                                    btn.textContent = 'Show less';
+                                    if (postDiv) {
+                                        postDiv.style.maxHeight = 'none';
+                                        postDiv.style.overflow = 'visible';
+                                    }
+                                } else {
+                                    holder.style.maxHeight = maxHeight + 'px';
+                                    holder.style.overflow = 'hidden';
+                                    btn.textContent = 'Show more';
+                                    if (postDiv) {
+                                        postDiv.style.maxHeight = '350px';
+                                        postDiv.style.overflow = 'hidden';
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }, 100);
+            }
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.30.8/dist/editorjs.umd.min.js"></script>
 </body>
 
 </html>
