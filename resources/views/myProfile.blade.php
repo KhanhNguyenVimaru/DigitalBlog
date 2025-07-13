@@ -52,52 +52,46 @@
 
 <body class="bg-gray-100 min-h-screen">
     @include('header')
-    <div class="flex justify-center w-full relative">
-        <div
-            class="max-w-6xl w-full mt-8 p-8 bg-white rounded-lg shadow-md flex flex-col md:flex-row items-start gap-8">
+    <div class="flex flex-row justify-center w-full relative gap-6">
+        <!-- Account Info -->
+        <div class="max-w-xs w-full mt-8 p-8 bg-white rounded-lg shadow-md flex flex-col items-center gap-8 mx-10">
             <!-- Avatar -->
-            <div class="flex flex-col items-center md:items-start w-full md:w-1/3 pl-50">
+            <div class="flex flex-col items-center w-full">
                 <img src="{{ $user->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}"
                     class="w-32 h-32 rounded-full object-cover border-2 border-gray-300 mb-4" alt="Avatar">
             </div>
-
-            <!-- Info + Actions -->
-            <div class="flex-1 flex flex-col items-start gap-4 w-auto">
-                <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 w-auto ml-12">
-                    <div class="flex flex-col items-center md:items-start">
-                        <h2 class="text-2xl font-bold">{{ $user->name }}</h2>
-                        <span class="text-gray-500 text-base">{{ $user->email }}</span>
-                    </div>
-                    @if ($user->privacy === 'public')
-                        <span class="px-3 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700"
-                            style="cursor: pointer;">{{ $user->privacy }}</span>
-                    @else
-                        <span class="px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700"
-                            style="cursor: pointer;">{{ $user->privacy }}</span>
-                    @endif
-                    <a href="{{ route('account') }}"
-                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-1 rounded transition text-sm">Edit
-                        profile</a>
-                </div>
-
-                <!-- Follower/Following/Posts row -->
-                <div class="flex flex-row justify-start gap-12 mt-2 w-auto ml-12">
-                    <div class="flex flex-row gap-8">
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-gray-800"><span class="js-posts-count">0</span></div>
-                            <div class="text-xs text-gray-500 uppercase tracking-wide">Posts</div>
-                        </div>
-                        <a href="#" id="followers-link" class="text-center">
-                            <div class="text-lg font-bold text-gray-800">{{ $user->followers_count ?? 0 }}</div>
-                            <div class="text-xs text-gray-500 uppercase tracking-wide">Followers</div>
-                        </a>
-                        <a href="#" id="following-link" class="text-center">
-                            <div class="text-lg font-bold text-gray-800">{{ $user->following_count ?? 0 }}</div>
-                            <div class="text-xs text-gray-500 uppercase tracking-wide">Following</div>
-                        </a>
-                    </div>
+            <!-- Privacy + Edit profile row -->
+            <div class="flex flex-row items-center gap-4 mb-2">
+                @if ($user->privacy === 'public')
+                    <span class="px-3 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700 cursor-pointer" style="cursor: pointer;">{{ $user->privacy }}</span>
+                @else
+                    <span class="px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 cursor-pointer" style="cursor: pointer;">{{ $user->privacy }}</span>
+                @endif
+                <a href="{{ route('account') }}"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-1 rounded transition text-sm">Edit profile</a>
+            </div>
+            <!-- User name & email -->
+            <div class="flex flex-col items-center mb-2">
+                <h2 class="text-2xl font-bold">{{ $user->name }}</h2>
+                <span class="text-gray-500 text-base">{{ $user->email }}</span>
+            </div>
+            <!-- Follower/Following row -->
+            <div class="flex flex-row justify-center gap-12 w-full">
+                <div class="flex flex-row gap-8">
+                    <a href="#" id="followers-link" class="text-center">
+                        <div class="text-lg font-bold text-gray-800">{{ $user->followers_count ?? 0 }}</div>
+                        <div class="text-xs text-gray-500 uppercase tracking-wide">Followers</div>
+                    </a>
+                    <a href="#" id="following-link" class="text-center">
+                        <div class="text-lg font-bold text-gray-800">{{ $user->following_count ?? 0 }}</div>
+                        <div class="text-xs text-gray-500 uppercase tracking-wide">Following</div>
+                    </a>
                 </div>
             </div>
+        </div>
+        <!-- Grid for Posts (1 hàng ngang, tự wrap) -->
+        <div class="flex-1 flex flex-col gap-6 mt-8 mx-10 ml-0">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="posts-row-all"></div>
         </div>
     </div>
 
@@ -169,7 +163,6 @@
 
     <!-- Danh sách bài viết của user -->
     <div id="user-posts" class="max-w-6xl mx-auto mt-8">
-        <h3 class="text-xl font-bold mb-4 text-gray-800">My Posts</h3>
         <div id="posts-list" class="w-11/12 md:w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 justify-between">
         </div>
     </div>
@@ -245,11 +238,12 @@
                 })
                 .then(res => res.json())
                 .then(posts => {
-                    const postsList = document.getElementById('posts-list');
-                    // Hiển thị số lượng post lên mục Posts
+                    // Hiển thị số lượng post lên mục Posts (nếu còn dùng ở nơi khác)
                     const postsCount = posts.length;
                     const postsCountEls = document.querySelectorAll('.js-posts-count');
                     postsCountEls.forEach(el => el.textContent = postsCount);
+                    const postsList = document.getElementById('posts-row-all');
+                    postsList.innerHTML = '';
                     if (!posts.length) {
                         postsList.innerHTML = '<div class="text-gray-500">No posts yet.</div>';
                         return;
@@ -258,19 +252,16 @@
                         let categoryName = post.category ? post.category.content : 'No category';
                         let status = post.status.charAt(0).toUpperCase() + post.status.slice(1);
                         let createdAt = new Date(post.created_at).toLocaleString();
-
                         // Tạo khung bài viết
                         const postDiv = document.createElement('div');
                         postDiv.className = 'bg-white rounded-lg shadow p-4 flex flex-col relative';
                         postDiv.style.minHeight = '100px';
                         postDiv.style.maxHeight = '180px';
                         postDiv.style.overflow = 'hidden';
-
                         // Tạo id duy nhất cho modal và button
                         const modalId = `modal-post-actions-${post.id}`;
                         const modalPanelId = `modal-post-actions-panel-${post.id}`;
                         const btnId = `post-actions-btn-${post.id}`;
-
                         // Header bài viết chỉ còn title và nút actions
                         postDiv.innerHTML = `
                         <div class="flex flex-row items-center mb-2 justify-between">
@@ -297,9 +288,7 @@
                         </div>
                         <div class="text-xs text-gray-400 mt-auto cursor-pointer">${createdAt}</div>
                         `;
-
                         postsList.appendChild(postDiv);
-
                         // Sự kiện mở dropdown cho từng post
                         setTimeout(() => {
                             const btn = document.getElementById(btnId);

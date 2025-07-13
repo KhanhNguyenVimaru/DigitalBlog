@@ -22,7 +22,7 @@ class PostController extends Controller
         $post->status = $post->status === 'public' ? 'private' : 'public';
         $post->save();
 
-        return response()->json(['success' => true, 'message' => 'Post status updated successfully', 'status' => $post->status], 200);
+        return response()->json(['success' => true, 'message' => 'Post status updated successfully', 'status' => $post->status]);
     }
     /**
      * Display a listing of the resource.
@@ -31,7 +31,7 @@ class PostController extends Controller
     {
         $post = post::findOrFail($id);
         if ($post->authorId !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json(['error' => 'Unauthorized']);
         }                           
         DB::beginTransaction();
         try {
@@ -42,10 +42,10 @@ class PostController extends Controller
             // Xóa bài viết
             $post->delete();
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Post deleted successfully'], 200);
+            return response()->json(['success' => true, 'message' => 'Post deleted successfully']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Failed to delete post', 'message' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to delete post', 'message' => $e->getMessage()]);
         }
     }
 
