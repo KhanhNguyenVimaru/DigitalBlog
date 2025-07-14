@@ -58,8 +58,10 @@
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label class="block mb-2 text-sm font-medium text-gray-700">Attachment (optional)</label>
-                    <input id="additionFile" type="file" name="additionFile" class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Cover Image</label>
+                    <input id="coverImage" type="file" name="coverImage" accept="image/*" class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+                    <div id="cover-preview" class="mt-2"></div>
+                    <button id="remove-cover-btn" type="button" class="mt-2 px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 text-sm font-semibold hidden cursor-pointer">Remove image</button>
                 </div>
                 <div class="editor-container">
                     <div id="editorjs"></div>
@@ -107,7 +109,7 @@
                 const title = document.getElementById('title').value;
                 const status = document.getElementById('status').value;
                 const categoryId = document.getElementById('categoryId').value;
-                const additionFile = document.getElementById('additionFile').files[0];
+                const coverImage = document.getElementById('coverImage').files[0];
                 // Lấy content từ EditorJS
                 editor.save().then((outputData) => {
                     const formData = new FormData();
@@ -117,8 +119,8 @@
                     if (categoryId) {
                         formData.append('categoryId', categoryId);
                     }
-                    if (additionFile) {
-                        formData.append('additionFile', additionFile);
+                    if (coverImage) {
+                        formData.append('coverImage', coverImage);
                     }
 
                     fetch(postBtn.dataset.url, {
@@ -135,7 +137,8 @@
                             document.getElementById('title').value = '';
                             document.getElementById('status').selectedIndex = 0;
                             document.getElementById('categoryId').selectedIndex = 0;
-                            document.getElementById('additionFile').value = '';
+                            document.getElementById('coverImage').value = '';
+                            document.getElementById('cover-preview').innerHTML = '';
                             if(window.editor) {
                                 window.editor.clear();
                             }
@@ -157,7 +160,8 @@
                         document.getElementById('title').value = '';
                         document.getElementById('status').selectedIndex = 0;
                         document.getElementById('categoryId').selectedIndex = 0;
-                        document.getElementById('additionFile').value = '';
+                        document.getElementById('coverImage').value = '';
+                        document.getElementById('cover-preview').innerHTML = '';
                         if(window.editor) {
                             window.editor.clear();
                         }
@@ -169,6 +173,30 @@
                     });
                 });
             });
+        });
+        // Preview cover image
+        document.getElementById('coverImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('cover-preview');
+            const removeBtn = document.getElementById('remove-cover-btn');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    preview.innerHTML = `<img src="${ev.target.result}" alt="Cover Preview" class="max-h-40 rounded shadow">`;
+                };
+                reader.readAsDataURL(file);
+                removeBtn.classList.remove('hidden');
+            } else {
+                preview.innerHTML = '';
+                removeBtn.classList.add('hidden');
+            }
+        });
+        document.getElementById('remove-cover-btn').addEventListener('click', function() {
+            const input = document.getElementById('coverImage');
+            const preview = document.getElementById('cover-preview');
+            input.value = '';
+            preview.innerHTML = '';
+            this.classList.add('hidden');
         });
     </script>
 </body>

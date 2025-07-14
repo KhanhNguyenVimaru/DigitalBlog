@@ -31,6 +31,7 @@ Route::post('/uploadFile', [PostController::class, 'uploadFile'])->name('uploadF
 Route::get('/content-of-users', [PostController::class, 'contentOfUsers'])->name('contentOfUsers')->middleware('auth');
 Route::delete('/delete-post/{id}', [PostController::class, 'deletePost'])->name('deletePost')->middleware('auth');
 Route::patch('/update-status/{id}', [PostController::class, 'updateStatus'])->name('updateStatus')->middleware('auth');
+Route::get('/post-content-viewer/{id}', [App\Http\Controllers\PostController::class, 'viewContentJson'])->name('post.content.viewer');
 // API CATEGORY
 Route::get('/categories', [CategoryController::class, 'getAllCategories'])->name('getAllCategories')->middleware('auth');
 // URL verify register

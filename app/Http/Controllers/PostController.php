@@ -60,7 +60,7 @@ class PostController extends Controller
         return response()->json([
             'success' => 1,
             'file' => [
-                'url' => Storage::url($path) // đúng: trả về /storage/uploads/abc.png
+                'url' => Storage::url($path)
             ]
         ], 200);
     }
@@ -73,9 +73,15 @@ class PostController extends Controller
             'categoryId' => 'nullable|exists:categories,id',
             'groupId' => 'nullable|exists:groups,id',
             'content' => 'required|string',
-            'additionFile' => 'nullable|max:2048', // Tối đa 2MB
-            'additionFile.*' => 'file|mimes:jpeg,png,jpg,webp,pdf,doc,docx,xls,xlsx,txt' // Các định dạng cho phép
+            'coverImage' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // Chỉ cho phép ảnh, tối đa 2MB
         ]);
+        $exists = post::where('title', $validated['title'])
+            ->where('authorId', Auth::id())
+            ->exists();
+
+        if ($exists) {
+            return response()->json(['error' => 'Post with this title already exists']);
+        }
 
         $userId = Auth::id();
         $content = $request->input('content');
@@ -86,11 +92,11 @@ class PostController extends Controller
         DB::beginTransaction();
 
         try {
-            // biến file bổ sung
-            if ($request->hasFile('additionFile')) {
-                $file = $request->file('additionFile');
+            // Lưu ảnh đại diện nếu có
+            if ($request->hasFile('coverImage')) {
+                $file = $request->file('coverImage');
                 $path = $file->store('uploads', 'public');
-                $validated['additionFile'] = Storage::url($path); // Lưu đường dẫn
+                $validated['additionFile'] = Storage::url($path); // Lưu đường dẫn vào additionFile
             }
 
             $post = new Post();
@@ -99,7 +105,7 @@ class PostController extends Controller
             $post->categoryId = $validated['categoryId'] ?? null;
             $post->groupId = $validated['groupId'] ?? null;
             $post->authorId = $userId;
-            $post->additionFile = $validated['additionFile'] ?? null;
+            $post->additionFile = $validated['additionFile'] ?? null; // additionFile là ảnh đại diện
 
             // Nếu content <= 65535 bytes ➝ lưu vào posts.content
             if ($contentSize <= 65535) {
@@ -143,6 +149,22 @@ class PostController extends Controller
         return response()->json($posts);
     }
 
+    /**
+     * Xem nội dung post dạng JSON EditorJS
+     */
+    public function viewContentJson($id)
+    {
+        $post = post::with('category', 'author')->findOrFail($id);
+        return view('post_content_viewer', [
+            'content' => $post->content,
+            'title' => $post->title,
+            'category' => $post->category ? $post->category->content : null,
+            'category_id' => $post->category ? $post->category->id : null,
+            'author_avatar' => $post->author && $post->author->avatar ? $post->author->avatar : 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg',
+            'author_name' => $post->author ? $post->author->name : 'Unknown',
+            'created_at' => $post->created_at->format('Y-m-d') ? $post->created_at->format('Y-m-d') : 'Unknown',
+        ]);
+    }
     public function index()
     {
         //

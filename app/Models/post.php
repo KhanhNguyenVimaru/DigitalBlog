@@ -25,4 +25,9 @@ class post extends Model
     {
         return $this->hasMany(\App\Models\long_content::class, 'postId');
     }
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'authorId');
+    }
 }

@@ -39,22 +39,22 @@
                     </div>
                 </div>
                 <!-- Title -->
-                <h1 class="text-base font-bold leading-tight tracking-tight text-gray-600 text-center">
+                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-600 text-center">
                     Account Settings
                 </h1>
 
                 <!-- Full name -->
                 <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-600">Full name</label>
-                    <div class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 text-sm">
+                    <label class="block mb-2 text-sm font-medium text-gray-600">Full name</label>
+                    <div class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 text-base">
                         {{ Auth::user()->name }}
                     </div>
                 </div>
 
                 <!-- Email -->
                 <div>
-                    <label class="block mb-2 text-xs font-medium text-gray-600">Email address</label>
-                    <div class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 text-sm">
+                    <label class="block mb-2 text-sm font-medium text-gray-600">Email address</label>
+                    <div class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 text-base">
                         {{ Auth::user()->email }}
                     </div>
                 </div>
@@ -68,13 +68,13 @@
                     @method('PATCH')
                     
                     @if (session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded text-base">
                             {{ session('success') }}
                         </div>
                     @endif
                     
                     @if ($errors->any())
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-base">
                             <ul class="list-disc list-inside">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
@@ -85,8 +85,8 @@
                     
                     <!-- Privacy -->
                     <div>
-                        <label class="block mb-2 text-xs font-medium text-gray-600">Privacy</label>
-                        <select class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full text-sm"
+                        <label class="block mb-2 text-sm font-medium text-gray-600">Privacy</label>
+                        <select class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full text-base"
                             style="height: 40px; important;" name = "privacy" value = "{{ $user->privacy }}">
                             <option value="public" {{ old('privacy', $user->privacy) == 'public' ? 'selected' : '' }}>
                                 Public</option>
@@ -97,10 +97,10 @@
 
                     <!-- Description -->
                     <div class="mb-0">
-                        <label class="block mb-2 text-xs font-medium text-gray-600">Description</label>
-                        <textarea class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full resize-none text-sm" rows="4"
+                        <label class="block mb-2 text-sm font-medium text-gray-600">Description</label>
+                        <textarea class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full resize-none text-base" rows="4"
                             placeholder="Description (max 255 characters)" name="description" maxlength="255">{{ old('description', $user->description) }}</textarea>
-                        <div class="text-xs text-gray-500 mt-1">
+                        <div class="text-sm text-gray-500 mt-1">
                             <span id="char-count">0</span>/255 characters
                         </div>
                     </div>
@@ -108,7 +108,7 @@
                     <!-- Save settings button -->
                     <div class="flex justify-end">
                         <button type="submit"
-                            class="w-1/4 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center cursor-pointer h-8">
+                            class="w-1/4 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center cursor-pointer h-8">
                             Save settings
                         </button>
                     </div>
@@ -117,26 +117,26 @@
                 <form id="change-password-form" class="space-y-4" method="POST" action="/change_password">
                     @csrf
                     <div>
-                        <label class="block mb-2 text-xs font-medium text-gray-600">Current password</label>
+                        <label class="block mb-2 text-sm font-medium text-gray-600">Current password</label>
                         <input type="password" name="current_password"
-                            class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full text-sm"
+                            class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full text-base"
                             placeholder="Current password" required />
                     </div>
                     <div>
-                        <label class="block mb-2 text-xs font-medium text-gray-600">New password</label>
+                        <label class="block mb-2 text-sm font-medium text-gray-600">New password</label>
                         <input type="password" name="new_password"
-                            class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full text-sm"
+                            class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full text-base"
                             placeholder="New password" required />
                     </div>
                     <div>
-                        <label class="block mb-2 text-xs font-medium text-gray-600">Confirm new password</label>
+                        <label class="block mb-2 text-sm font-medium text-gray-600">Confirm new password</label>
                         <input type="password" name="new_password_confirmation"
-                            class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full text-sm"
+                            class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full text-base"
                             placeholder="Confirm new password" required />
                     </div>
                     <div class="flex justify-end">
                         <button type="submit"
-                            class="mt-[10px] text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center w-1/4 cursor-pointer h-8">
+                            class="mt-[10px] text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center w-1/4 cursor-pointer h-8">
                             Change password
                         </button>
                     </div>
@@ -152,7 +152,7 @@
                         @method('DELETE')
                         <div class="flex justify-end">
                             <button type="submit"
-                                class="mt-5 flex items-center justify-center gap-2 px-3 py-1.5 bg-transparent text-red-600 hover:text-red-400 rounded-lg font-medium text-xs focus:outline-none focus:ring-2 focus:ring-red-100 w-full transition-colors cursor-pointer">
+                                class="mt-5 flex items-center justify-center gap-2 px-3 py-1.5 bg-transparent text-red-600 hover:text-red-400 rounded-lg font-medium text-sm focus:outline-none focus:ring-2 focus:ring-red-100 w-full transition-colors cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -167,7 +167,7 @@
                         @csrf
                         <div class="flex justify-end">
                             <button type="submit"
-                                class="mt-5 flex items-center justify-center gap-2 px-3 py-1.5 bg-transparent text-red-600 hover:text-red-400 rounded-lg font-medium text-xs focus:outline-none focus:ring-2 focus:ring-red-100 w-full transition-colors cursor-pointer">
+                                class="mt-5 flex items-center justify-center gap-2 px-3 py-1.5 bg-transparent text-red-600 hover:text-red-400 rounded-lg font-medium text-sm focus:outline-none focus:ring-2 focus:ring-red-100 w-full transition-colors cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                     <path stroke-linecap="round" stroke-linejoin="round"

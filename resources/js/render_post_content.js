@@ -47,4 +47,9 @@ export function renderPostContent(holderId, contentData) {
         }
     });
     holder.innerHTML = html;
+}
+window.renderPostContent = renderPostContent;
+
+if (window.contentData && document.getElementById('editorjs-render')) {
+    window.renderPostContent('editorjs-render', window.contentData);
 } 

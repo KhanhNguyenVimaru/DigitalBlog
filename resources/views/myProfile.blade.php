@@ -252,6 +252,8 @@
                         let categoryName = post.category ? post.category.content : 'No category';
                         let status = post.status.charAt(0).toUpperCase() + post.status.slice(1);
                         let createdAt = new Date(post.created_at).toLocaleString();
+                        let coverImg = post.additionFile ? post.additionFile : '/images/free-images-for-blog.png';
+
                         // Tạo khung bài viết
                         const postDiv = document.createElement('div');
                         postDiv.className = 'bg-white rounded-lg shadow p-4 flex flex-col relative';
@@ -265,7 +267,10 @@
                         // Header bài viết chỉ còn title và nút actions
                         postDiv.innerHTML = `
                         <div class="flex flex-row items-center mb-2 justify-between">
-                            <div class="font-bold text-base text-gray-800 cursor-pointer post-title-hover">${post.title || 'lỗi gì đó'}</div>
+                            <div class="flex items-center gap-3">
+                                <img src="${coverImg}" alt="cover" class="w-16 h-16 object-cover rounded-md border border-gray-200 bg-gray-100" style="aspect-ratio:1/1;">
+                                <a href="/post-content-viewer/${post.id}" class="font-bold text-base text-gray-800 cursor-pointer post-title-hover hover:underline">${post.title || 'lỗi gì đó'}</a>
+                            </div>  
                             <div class="relative cursor-pointer">
                                 <button id="${btnId}" class="p-2 rounded-full hover:bg-gray-200 focus:outline-none cursor-pointer" title="Actions" type="button">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-500 cursor-pointer">
