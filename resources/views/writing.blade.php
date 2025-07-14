@@ -162,6 +162,7 @@
                         document.getElementById('categoryId').selectedIndex = 0;
                         document.getElementById('coverImage').value = '';
                         document.getElementById('cover-preview').innerHTML = '';
+                        document.getElementById('remove-cover-btn').classList.add('hidden');
                         if(window.editor) {
                             window.editor.clear();
                         }

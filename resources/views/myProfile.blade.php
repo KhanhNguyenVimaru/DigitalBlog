@@ -15,7 +15,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .editorjs-content p {
-            font-size: 0.9rem;
+            font-size: 1.08rem;
             line-height: 1.4;
             margin-bottom: 0.5rem;
         }
@@ -23,13 +23,13 @@
         .editorjs-content h1,
         .editorjs-content h2,
         .editorjs-content h3 {
-            font-size: 1.1rem;
+            font-size: 1.35rem;
             margin-top: 0.5rem;
             margin-bottom: 0.25rem;
         }
 
         .editorjs-content img {
-            max-height: 100px;
+            max-height: 120px;
             object-fit: cover;
         }
 
@@ -54,7 +54,7 @@
     @include('header')
     <div class="flex flex-row justify-center w-full relative gap-6">
         <!-- Account Info -->
-        <div class="max-w-xs w-full mt-8 p-8 bg-white rounded-lg shadow-md flex flex-col items-center gap-8 mx-10">
+        <div class="max-w-xs w-full mt-8 p-8 bg-white rounded-lg shadow-md flex flex-col items-center gap-8 mx-10 mr-4">
             <!-- Avatar -->
             <div class="flex flex-col items-center w-full">
                 <img src="{{ $user->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}"
@@ -91,7 +91,7 @@
         </div>
         <!-- Grid for Posts (1 hàng ngang, tự wrap) -->
         <div class="flex-1 flex flex-col gap-6 mt-8 mx-10 ml-0">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="posts-row-all"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="posts-row-all"></div>
         </div>
     </div>
 
@@ -163,7 +163,7 @@
 
     <!-- Danh sách bài viết của user -->
     <div id="user-posts" class="max-w-6xl mx-auto mt-8">
-        <div id="posts-list" class="w-11/12 md:w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 justify-between">
+        <div id="posts-list" class="w-11/12 md:w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 justify-between">
         </div>
     </div>
     <div class="w-full h-20"></div>
@@ -257,8 +257,8 @@
                         // Tạo khung bài viết
                         const postDiv = document.createElement('div');
                         postDiv.className = 'bg-white rounded-lg shadow p-4 flex flex-col relative';
-                        postDiv.style.minHeight = '100px';
-                        postDiv.style.maxHeight = '180px';
+                        postDiv.style.minHeight = '120px';
+                        postDiv.style.maxHeight = '216px';
                         postDiv.style.overflow = 'hidden';
                         // Tạo id duy nhất cho modal và button
                         const modalId = `modal-post-actions-${post.id}`;
@@ -268,8 +268,8 @@
                         postDiv.innerHTML = `
                         <div class="flex flex-row items-center mb-2 justify-between">
                             <div class="flex items-center gap-3">
-                                <img src="${coverImg}" alt="cover" class="w-16 h-16 object-cover rounded-md border border-gray-200 bg-gray-100" style="aspect-ratio:1/1;">
-                                <a href="/post-content-viewer/${post.id}" class="font-bold text-base text-gray-800 cursor-pointer post-title-hover hover:underline">${post.title || 'lỗi gì đó'}</a>
+                                <img src="${coverImg}" alt="cover" class="w-22 h-22 object-cover rounded-md border border-gray-200 bg-gray-100" style="aspect-ratio:1/1;">
+                                <a href="/post-content-viewer/${post.id}" class="font-bold text-lg text-gray-800 cursor-pointer post-title-hover hover:underline">${post.title || 'lỗi gì đó'}</a>
                             </div>  
                             <div class="relative cursor-pointer">
                                 <button id="${btnId}" class="p-2 rounded-full hover:bg-gray-200 focus:outline-none cursor-pointer" title="Actions" type="button">

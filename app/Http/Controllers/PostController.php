@@ -149,6 +149,15 @@ class PostController extends Controller
         return response()->json($posts);
     }
 
+    public function contentOfAuthor($id){
+        $posts = post::where('authorId', $id)
+            ->with(['category', 'long_content'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($posts);
+    }
+
     /**
      * Xem nội dung post dạng JSON EditorJS
      */

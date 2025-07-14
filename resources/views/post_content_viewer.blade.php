@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ $title }} - Content Viewer</title>
     <link rel="icon" type="image/x-icon" href="https://www.svgrepo.com/show/475713/blog.svg" />
-    @vite(['resources/css/app.css', 'resources/js/render_post_content.js'])
+    @vite(['resources/css/app.css'])
     <style>
         .editorjs-content {
             font-size: 1.15rem;
@@ -35,7 +35,6 @@
         }
         .editorjs-content img {
             max-width: 100%;
-            max-height: 220px;
             object-fit: cover;
             margin: 1rem 0;
             border-radius: 0.5rem;
@@ -53,7 +52,7 @@
     @include('header')
     <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8 mt-5">
         @if($category)
-            <a href="/category/{{ $category_id }}" class="text-xs text-blue-600 hover:underline font-semibold mb-4 inline-block uppercase tracking-wide">{{ $category }}</a>
+            <a href="#"class="text-xs text-blue-600 hover:underline font-semibold mb-4 inline-block uppercase tracking-wide">{{ $category }}</a>
         @endif
         <h1 class="text-4xl font-bold mb-4 text-gray-900 text-center leading-tight">{{ $title }}</h1>
         <div class="flex items-center justify-start gap-3 mb-8">
@@ -91,7 +90,7 @@
                         }
                         break;
                     case 'image':
-                        html += `<img src="${block.data.file.url}" alt="" class="my-4 rounded mx-auto block" style="width:100%;height:auto;">`;
+                        html += `<div style=\"width:100%;display:flex;justify-content:center;align-items:center;\"><img src=\"${block.data.file.url}\" alt=\"\" class=\"my-4 mb-5 rounded\" style=\"width:90%;height:auto;object-fit:cover;display:block;\"></div>`;
                         break;
                     case 'quote':
                         html += `<blockquote class="border-l-4 border-blue-400 pl-4 italic text-gray-600 my-4">${block.data.text}<br><span class="block text-xs text-gray-400 mt-1">${block.data.caption || ''}</span></blockquote>`;
@@ -107,7 +106,7 @@
                         html += `<pre class="bg-gray-100 rounded p-2 overflow-x-auto mb-3">${block.data.html}</pre>`;
                         break;
                     case 'simpleImage':
-                        html += `<img src="${block.data.url}" alt="" class="my-4 rounded mx-auto block" style="width:60%;height:auto;">`;
+                        html += `<div style=\"width:100%;display:flex;justify-content:center;align-items:center;\"><img src=\"${block.data.url}\" alt=\"\" class=\"my-4 mb-5 rounded\" style=\"width:90%;height:auto;object-fit:cover;display:block;\"></div>`;
                         break;
                     default:
                         break;

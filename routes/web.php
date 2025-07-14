@@ -6,6 +6,7 @@ use App\Http\Middleware\checkValidToken;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Middleware\accessUserProfile;
 
 
 // PAGE UI
@@ -26,9 +27,12 @@ Route::delete('/delete_account', [UserController::class, 'deleteUserAccount'])->
 Route::middleware('auth:api')->post('/change_password', [UserController::class, 'changePassword'])->name('changePassword');
 Route::post('/update-avatar', [UserController::class, 'updateAvatar'])->middleware('auth');
 // API POST
+//  content of users ám chỉ bài viết của người dùng đăng nhập
+//  content of author là bài viết của người dùng khác
 Route::post('/insert-post', [PostController::class, 'storeContent'])->name('insertPost')->middleware('auth'); 
 Route::post('/uploadFile', [PostController::class, 'uploadFile'])->name('uploadFile')->middleware('auth');
 Route::get('/content-of-users', [PostController::class, 'contentOfUsers'])->name('contentOfUsers')->middleware('auth');
+Route::get('/content-of-author/{id}', [PostController::class, 'contentOfAuthor'])->name('contentOfAuthor'); 
 Route::delete('/delete-post/{id}', [PostController::class, 'deletePost'])->name('deletePost')->middleware('auth');
 Route::patch('/update-status/{id}', [PostController::class, 'updateStatus'])->name('updateStatus')->middleware('auth');
 Route::get('/post-content-viewer/{id}', [App\Http\Controllers\PostController::class, 'viewContentJson'])->name('post.content.viewer');
@@ -36,3 +40,5 @@ Route::get('/post-content-viewer/{id}', [App\Http\Controllers\PostController::cl
 Route::get('/categories', [CategoryController::class, 'getAllCategories'])->name('getAllCategories')->middleware('auth');
 // URL verify register
 Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
+// User profile
+Route::get('/user-profile/{id}', [UserController::class, 'userProfile'])->name('userProfile')->middleware(accessUserProfile::class);

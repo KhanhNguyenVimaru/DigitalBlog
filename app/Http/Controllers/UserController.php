@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
+    public function userProfile(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $private_profile = $request->get('private_profile', false);
+        return view('userProfile', compact('user', 'private_profile'));
+    }
+
     public function content(): Content
     {
         return new Content(
