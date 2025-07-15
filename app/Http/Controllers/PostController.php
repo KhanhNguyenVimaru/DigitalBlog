@@ -151,6 +151,7 @@ class PostController extends Controller
 
     public function contentOfAuthor($id){
         $posts = post::where('authorId', $id)
+            ->where('status', 'public') // Chỉ lấy bài viết công kha
             ->with(['category', 'long_content'])
             ->orderBy('created_at', 'desc')
             ->get();

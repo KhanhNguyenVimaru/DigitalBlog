@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
 use App\Models\followUser;
 use Illuminate\Support\Facades\Auth;
+use App\Models\followRequest;
 
 
 class accessUserProfile
@@ -33,6 +34,18 @@ class accessUserProfile
         if ($alreadyFollowed) {
             $request->merge(['already_followed' => true]);
         }
+
+        // Kiểm tra follow request
+        $requestSent = followRequest::where('followedId', $authorId)
+            ->where('userId_request', $followerId)
+            ->exists();
+        if ($requestSent && !$alreadyFollowed) {
+            $request->merge(['request_sent' => true]);
+        }
+        // Có thể mở rộng: kiểm tra trạng thái request (nếu có cột status), ở đây chỉ check tồn tại
+        // Nếu muốn cho gửi lại request, cần có logic xác định (ví dụ: request bị từ chối hoặc đã bị xóa)
+        // $canRequestAgain = ...
+        // $request->merge(['can_request_again' => true]);
 
         if ($pagePrivacy === 'private' && !$alreadyFollowed && $authorId !== $followerId) {
             $request->merge(['private_profile' => true]);

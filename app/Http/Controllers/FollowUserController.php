@@ -42,19 +42,26 @@ class FollowUserController extends Controller
             ->where('followerId', $myId)
             ->exists();
         if ($exists) {
-            return response()->json(['success' => false, 'message' => 'You are already following this user.']);
+            return response()->json(['type' => 'following', 'success' => false, 'message' => 'You are already following this user.']);
         }
 
         $authorPrivacy = User::where('id', $id)->value('privacy');
         if ($authorPrivacy === "private") {
+            // Kiểm tra đã gửi request chưa
+            $requestExists = followRequest::where('followedId', $userId)
+                ->where('userId_request', $myId)
+                ->exists();
+            if ($requestExists) {
+                return response()->json(['type' => 'sent_request', 'success' => false, 'message' => 'Request already sent']);
+            }
             try {
                 $queue = new followRequest();
                 $queue->followedId = $userId;
                 $queue->userId_request = $myId;
                 $queue->save();
-                return response()->json(['success' => true, 'message' => "Request has been sent"]);
+                return response()->json(['type' => 'request', 'success' => true, 'message' => "Request has been sent"]);
             } catch (\Exception $e) {
-                return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+                return response()->json(['type' => 'request', 'success' => false, 'message' => 'Error: ' . $e->getMessage()]);
             }
         } else {
             try {
@@ -62,10 +69,27 @@ class FollowUserController extends Controller
                 $relation->authorId = $userId;
                 $relation->followerId = $myId;
                 $relation->save();
-                return response()->json(['success' => true, 'message' => "Follow user completed!"]);
+                return response()->json(['type' => 'follow', 'success' => true, 'message' => "Follow user completed!"]);
             } catch (\Exception $e) {
-                return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+                return response()->json(['type' => 'follow', 'success' => false, 'message' => 'Error: ' . $e->getMessage()]);
             }
+        }
+    }
+
+    public function revokeFollowRequest($id)
+    {
+        $myId = Auth::user()->id;
+        try {
+            $deleted = \App\Models\followRequest::where('followedId', $id)
+                ->where('userId_request', $myId)
+                ->delete();
+            if ($deleted) {
+                return response()->json(['success' => true, 'message' => 'Request revoked successfully.']);
+            } else {
+                return response()->json(['success' => false, 'message' => 'No follow request found.']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
     /**

@@ -70,6 +70,10 @@
                     account is private</span>
                 @if($already_followed)
                     <button id="unfollow-btn" class="bg-gray-400 cursor-pointer text-white font-semibold px-6 py-2 rounded-full shadow transition text-sm mt-2 w-32">Following</button>
+                @elseif($request_sent)
+                    <button id="revoke-request-btn" class="bg-gray-400 cursor-pointer text-white font-semibold px-6 py-2 rounded-full shadow transition text-sm mt-2 w-32">Pending</button>
+                @elseif($can_request_again)
+                    <button id="request-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-full shadow transition text-sm mt-2 w-32">Request</button>
                 @else
                     <button id="follow-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-full shadow transition text-sm mt-2 w-32">Follow</button>
                 @endif
@@ -290,10 +294,41 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            followBtn.textContent = 'Following';
-                            followBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                            followBtn.classList.add('bg-gray-400', 'cursor-default');
-                            followBtn.disabled = true;
+                            if (data.type === 'request') {
+                                // Đổi nút thành Pending (có thể bấm để thu hồi)
+                                followBtn.textContent = 'Pending';
+                                followBtn.id = 'revoke-request-btn';
+                                followBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                                followBtn.classList.add('bg-gray-400', 'cursor-pointer');
+                                followBtn.disabled = false;
+                                // Gắn lại event thu hồi request
+                                followBtn.addEventListener('click', function revokeHandler() {
+                                    fetch(`/revoke_follow_request/${userId}`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                            'X-Requested-With': 'XMLHttpRequest'
+                                        }
+                                    })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            location.reload();
+                                        } else {
+                                            alert(data.message || 'Revoke request failed!');
+                                        }
+                                    })
+                                    .catch(() => {
+                                        alert('Revoke request failed!');
+                                    });
+                                }, { once: true });
+                            } else if (data.type === 'follow') {
+                                followBtn.textContent = 'Following';
+                                followBtn.id = 'unfollow-btn';
+                                followBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                                followBtn.classList.add('bg-gray-400', 'cursor-default');
+                                followBtn.disabled = true;
+                            }
                         } else {
                             alert(data.message || 'Follow failed!');
                         }
@@ -325,6 +360,30 @@
                 })
                 .catch(() => {
                     alert('Unfollow failed!');
+                });
+            });
+        }
+        const revokeRequestBtn = document.getElementById('revoke-request-btn');
+        if (revokeRequestBtn) {
+            revokeRequestBtn.addEventListener('click', function() {
+                const userId = {{ $user->id }};
+                fetch(`/revoke_follow_request/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Revoke request failed!');
+                    }
+                })
+                .catch(() => {
+                    alert('Revoke request failed!');
                 });
             });
         }

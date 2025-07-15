@@ -19,7 +19,9 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $private_profile = $request->get('private_profile', false);
         $already_followed = $request->get('already_followed', false);
-        return view('userProfile', compact('user', 'private_profile', 'already_followed'));
+        $request_sent = $request->get('request_sent', false);
+        $can_request_again = $request->get('can_request_again', false);
+        return view('userProfile', compact('user', 'private_profile', 'already_followed', 'request_sent', 'can_request_again'));
     }
 
     public function content(): Content

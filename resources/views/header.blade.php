@@ -9,13 +9,16 @@
                 <span class="text-md font-bold" style="color: #2832c2">DIGITAL BLOG</span>
             </a>
         </div>
-        <div class="flex flex-1 justify-center min-w-0" id="nav-links">
+        <div class="flex flex-1 justify-center min-w-0 relative" id="nav-links">
             <a href="/" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Feed</a>
-            <a href="#" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Community</a>
             <a href="/writing" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Writing</a>
-            @if ($role === 'admin')
-                <a href="/admin" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Admin</a>
-            @endif
+            <a href="#" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Community</a>
+            <a href="#" id="notification-bell" class="text-sm font-semibold text-gray-600 hover:text-black px-4 relative">Notification
+                <div id="notification-dropdown" class="hidden absolute left-0 mt-2 w-80 bg-white border border-gray-200 rounded shadow-lg z-50 p-4">
+                    <div class="font-semibold text-gray-700 mb-2">Notifications</div>
+                    <div class="text-gray-500 text-sm">No notifications yet.</div>
+                </div>
+            </a>
             <a href="#" id="search-nav-link"
                 class="text-sm font-semibold text-gray-600 hover:text-black px-4">Search</a>
         </div>
@@ -40,6 +43,9 @@
                     class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50">
                     <a href="/my-profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">My Profile</a>
                     <a href="/page_account" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Setting</a>
+                    @if ($role === 'admin')
+                        <a href="/admin" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Admin</a>
+                    @endif
                     <button id="logout-btn" type="button"
                         class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 text-red-600 cursor-pointer">Logout</button>
                 </div>
@@ -121,6 +127,21 @@
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
                     // TODO: Xử lý search
+                }
+            });
+        }
+        // Notification bell logic
+        const bell = document.getElementById('notification-bell');
+        const dropdown = document.getElementById('notification-dropdown');
+        if (bell && dropdown) {
+            bell.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target) && !bell.contains(e.target)) {
+                    dropdown.classList.add('hidden');
                 }
             });
         }
