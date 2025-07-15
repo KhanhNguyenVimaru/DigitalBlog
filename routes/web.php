@@ -7,7 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Middleware\accessUserProfile;
-
+use App\Http\Controllers\FollowUserController;
 
 // PAGE UI
 Route::get('/', function () {return view('index');})->middleware('auth');
@@ -42,3 +42,7 @@ Route::get('/categories', [CategoryController::class, 'getAllCategories'])->name
 Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
 // User profile
 Route::get('/user-profile/{id}', [UserController::class, 'userProfile'])->name('userProfile')->middleware(accessUserProfile::class);
+// suggest search
+Route::get('/search-suggest', [UserController::class, 'searchSuggest'])->name('search.suggest');
+// Follow user
+Route::get('/follow_user/{id}',[FollowUserController::class, 'followUser'])->name('followUser')->middleware('auth');

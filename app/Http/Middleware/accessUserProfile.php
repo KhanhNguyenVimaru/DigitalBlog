@@ -19,22 +19,23 @@ class accessUserProfile
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $pagePrivacy = User::findOrFail($request->route('id'))->privacy;
-        if(Auth::user()->id === $request->route('id')){
-            return redirect()->route('myProfile');
+        $user = User::find($request->route('id'));
+        if (!$user || $user->banned) {
+            return response()->view('404', [], 404);
+        }
+        $pagePrivacy = $user->privacy;
+        $authorId = $user->id;
+        $followerId = Auth::user()->id;
+
+        $alreadyFollowed = followUser::where('authorId', $authorId)
+            ->where('followerId', $followerId)
+            ->exists();
+        if ($alreadyFollowed) {
+            $request->merge(['already_followed' => true]);
         }
 
-        if ($pagePrivacy === 'private') {
-
-            $authorId = $request->route('id');
-            $followerId = Auth::user()->id;
-
-            $relationExits = followUser::where('authorId', $authorId)
-                ->where('followerId', $followerId)
-                ->exists();
-            if (!$relationExits && $authorId !== $followerId) {
-                $request->merge(['private_profile' => true]);
-            }
+        if ($pagePrivacy === 'private' && !$alreadyFollowed && $authorId !== $followerId) {
+            $request->merge(['private_profile' => true]);
         }
         return $next($request);
     }

@@ -4,21 +4,27 @@
 @endphp
 <header class="bg-white z-50">
     <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
-        <div class="flex flex-1 min-w-0">
-            <a href="/" class="flex items-center gap-2 -m-1.5 p-1.5">
+        <div class="flex flex-1 min-w-0 items-center">
+            <a href="/" class="flex items-center gap-2 -m-1.5 p-1.5 cursor-pointer">
                 <span class="text-md font-bold" style="color: #2832c2">DIGITAL BLOG</span>
             </a>
         </div>
-        <div class="flex flex-wrap gap-4 flex-1 justify-center min-w-0">
-            <a href="/" class="text-sm font-semibold text-gray-600 hover:text-black px-2">Feed</a>
-            <a href="#" class="text-sm font-semibold text-gray-600 hover:text-black px-2">Community</a>
-            <a href="/myProfile" class="text-sm font-semibold text-gray-600 hover:text-black px-2">Following</a>
-            <a href="/writing" class="text-sm font-semibold text-gray-600 hover:text-black px-2">Writing</a>
-            @if ($role === 'admin') 
-                <a href="/admin" class="text-sm f   ont-semibold text-gray-600 hover:text-black px-2">Admin</a>
+        <div class="flex flex-1 justify-center min-w-0" id="nav-links">
+            <a href="/" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Feed</a>
+            <a href="#" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Community</a>
+            <a href="/writing" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Writing</a>
+            @if ($role === 'admin')
+                <a href="/admin" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Admin</a>
             @endif
+            <a href="#" id="search-nav-link"
+                class="text-sm font-semibold text-gray-600 hover:text-black px-4">Search</a>
         </div>
-        <div class="flex flex-1 justify-end min-w-0">
+        <div class="flex flex-1 justify-end min-w-0 items-center gap-3 relative">
+            <div id="search-input-wrapper"
+                class="fixed left-0 right-0 top-0 z-50 flex justify-center items-center h-[72px]">
+                <input id="search-input" type="text" placeholder="Search..."
+                    class="w-1/2 min-w-[200px] max-w-xl px-4 py-2 border border-gray-300 rounded-full shadow focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm bg-white" />
+            </div>
             <a id="login-link" style="display:none" href="/page_login"
                 class="text-sm font-semibold text-gray-600 hover:text-black">Log in<span
                     aria-hidden="true">&rarr;</span></a>
@@ -42,15 +48,30 @@
     </nav>
 </header>
 
+<style>
+    #search-input-wrapper {
+        transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-16px) scale(0.98);
+    }
+
+    #search-input-wrapper.active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+    }
+</style>
+
 <script src="/js/logout.js"></script>
+<script src="/js/search_suggest.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const loginLink = document.getElementById('login-link');
         const accountWrapper = document.getElementById('account-dropdown-wrapper');
         const accountLink = document.getElementById('account-link');
         const accountDropdown = document.getElementById('account-dropdown');
         const mobileWrapper = document.getElementById('mobile-account-wrapper');
-
         // Hiển thị đúng trạng thái đăng nhập
         if (loginLink && accountWrapper) {
             if (localStorage.getItem('token') === null) {
@@ -63,20 +84,44 @@
                 if (mobileWrapper) mobileWrapper.style.display = 'block';
             }
         }
-
         // Dropdown logic
         if (accountLink && accountDropdown) {
             // Đóng dropdown khi click ra ngoài
-            document.addEventListener('click', function (e) {
+            document.addEventListener('click', function(e) {
                 if (!accountDropdown.contains(e.target) && !accountLink.contains(e.target)) {
                     accountDropdown.classList.add('hidden');
                 }
             });
-
             // Toggle dropdown khi click vào account
-            accountLink.addEventListener('click', function (e) {
+            accountLink.addEventListener('click', function(e) {
                 e.preventDefault();
                 accountDropdown.classList.toggle('block');
+            });
+        }
+        // Search nav-link logic
+        const searchNavLink = document.getElementById('search-nav-link');
+        const navLinks = document.getElementById('nav-links');
+        const searchInputWrapper = document.getElementById('search-input-wrapper');
+        const searchInput = document.getElementById('search-input');
+        if (searchNavLink && navLinks && searchInputWrapper && searchInput) {
+            searchNavLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                navLinks.classList.add('hidden');
+                searchInputWrapper.classList.add('active');
+                searchInput.focus();
+            });
+            // Click ra ngoài input sẽ ẩn input và hiện lại nav-links
+            document.addEventListener('mousedown', function(e) {
+                if (!searchInputWrapper.contains(e.target) && !searchNavLink.contains(e.target)) {
+                    searchInputWrapper.classList.remove('active');
+                    navLinks.classList.remove('hidden');
+                }
+            });
+            // Optional: Enter để submit search
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    // TODO: Xử lý search
+                }
             });
         }
     });

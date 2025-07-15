@@ -66,8 +66,13 @@
             <div class="flex flex-col items-center mb-2 w-full">
                 <h2 class="text-2xl font-bold">{{ $user->name }}</h2>
                 <span class="text-gray-500 text-base mb-2">{{ $user->email }}</span>
-                <span id="private-badge" style="display:none" class="text-xs text-red-500 font-semibold mb-2">This account is private</span>
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-full shadow transition text-sm mt-2 w-32">Follow</button>
+                <span id="private-badge" style="display:none" class="text-xs text-red-500 font-semibold mb-2">This
+                    account is private</span>
+                @if($already_followed)
+                    <button id="follow-btn" class="bg-gray-400 cursor-default text-white font-semibold px-6 py-2 rounded-full shadow transition text-sm mt-2 w-32" disabled>Following</button>
+                @else
+                    <button id="follow-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-full shadow transition text-sm mt-2 w-32">Follow</button>
+                @endif
             </div>
             <!-- Follower/Following row -->
             <div class="flex flex-row justify-center gap-12 w-full">
@@ -83,11 +88,16 @@
                 </div>
             </div>
         </div>
+        @if (request('private_profile'))
+        <div id="private-notice"
+            class="w-full text-gray-700 p-8 rounded-lg text-start text-lg font-semibold mt-6 min-h-[180px] mt-12">
+            This account is <span class="font-bold mx-1">private</span>. <br>
+            You need to follow to see this user's posts.
+        </div>
+        @endif
+
         <!-- Main content (bên phải) -->
         <div class="flex-1 flex flex-col gap-6 mt-8 mx-10 ml-0">
-            <div id="private-notice" style="display:none" class="w-full bg-white border border-gray-200 text-gray-700 p-8 rounded-lg shadow text-center text-lg font-semibold mt-6 flex items-center justify-center min-h-[180px]">
-                This account is <span class="font-bold mx-1">private</span>.<br>You need to follow to see this user's posts.
-            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="posts-row-all"></div>
         </div>
     </div>
@@ -212,12 +222,10 @@
 
                 // Logic kiểm tra private_profile bằng JS
                 if (PRIVATE_PROFILE) {
-                    document.getElementById('private-notice').style.display = '';
                     document.getElementById('posts-row-all').style.display = 'none';
                     document.getElementById('private-badge').style.display = '';
                     return;
                 } else {
-                    document.getElementById('private-notice').style.display = 'none';
                     document.getElementById('posts-row-all').style.display = '';
                     document.getElementById('private-badge').style.display = 'none';
                 }
@@ -242,7 +250,8 @@
                             let categoryName = post.category ? post.category.content : 'No category';
                             let status = post.status.charAt(0).toUpperCase() + post.status.slice(1);
                             let createdAt = new Date(post.created_at).toLocaleString();
-                            let coverImg = post.additionFile ? post.additionFile : '/images/free-images-for-blog.png';
+                            let coverImg = post.additionFile ? post.additionFile :
+                                '/images/free-images-for-blog.png';
                             // Tạo khung bài viết (không có nút actions)
                             const postDiv = document.createElement('div');
                             postDiv.className = 'bg-white rounded-lg shadow p-4 flex flex-col relative';
@@ -271,5 +280,30 @@
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.30.8/dist/editorjs.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const followBtn = document.getElementById('follow-btn');
+        if (followBtn) {
+            followBtn.addEventListener('click', function() {
+                const userId = {{ $user->id }};
+                fetch(`/follow_user/${userId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            followBtn.textContent = 'Following';
+                            followBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                            followBtn.classList.add('bg-gray-400', 'cursor-default');
+                            followBtn.disabled = true;
+                        } else {
+                            alert(data.message || 'Follow failed!');
+                        }
+                    })
+                    .catch(() => {
+                        alert('Follow failed!');
+                    });
+            });
+        }
+    });
+</script>
 
 </html>

@@ -5,9 +5,37 @@ namespace App\Http\Controllers;
 use App\Models\followUser;
 use App\Http\Requests\StorefollowUserRequest;
 use App\Http\Requests\UpdatefollowUserRequest;
+use Illuminate\Support\Facades\Auth;
 
 class FollowUserController extends Controller
 {
+    public function followUser($id)
+    {
+        $myId = Auth::user()->id;
+        $userId = $id;
+
+        if ($myId == $userId) {
+            return response()->json(['success' => false, 'message' => 'You cannot follow yourself.']);
+        }
+
+        $exists = \App\Models\followUser::where('authorId', $userId)
+            ->where('followerId', $myId)
+            ->exists();
+
+        if ($exists) {
+            return response()->json(['success' => false, 'message' => 'You are already following this user.']);
+        }
+
+        try {
+            $relation = new \App\Models\followUser;
+            $relation->authorId = $userId;
+            $relation->followerId = $myId;
+            $relation->save();
+            return response()->json(['success' => true, 'message' => "Follow user completed!"]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
     /**
      * Display a listing of the resource.
      */

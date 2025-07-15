@@ -9,6 +9,8 @@ use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Group;
+use App\Models\Post;
 
 class UserController extends Controller
 {
@@ -16,7 +18,8 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $private_profile = $request->get('private_profile', false);
-        return view('userProfile', compact('user', 'private_profile'));
+        $already_followed = $request->get('already_followed', false);
+        return view('userProfile', compact('user', 'private_profile', 'already_followed'));
     }
 
     public function content(): Content
@@ -115,5 +118,26 @@ class UserController extends Controller
         $user->avatar = '/storage/' . $path;
         $user->save();
         return response()->json(['success' => true, 'avatar_url' => $user->avatar]);
+    }
+
+    public function searchSuggest(Request $request)
+    {
+        $q = $request->input('q', '');
+        if (!$q) return response()->json([]);
+        $limit = 10;
+        $users = \App\Models\User::where(function($query) use ($q) {
+                $query->where('name', 'like', "%$q%")
+                      ->orWhere('email', 'like', "%$q%");
+            })
+            ->selectRaw("'user' as type, name as value, id")
+            ->limit($limit)->get();
+        $groups = Group::where('name', 'like', "%$q%")
+            ->selectRaw("'group' as type, name as value, id")
+            ->limit($limit)->get();
+        $posts = Post::where('title', 'like', "%$q%")
+            ->selectRaw("'post' as type, title as value, id")
+            ->limit($limit)->get();
+        $results = $users->concat($groups)->concat($posts)->take($limit);
+        return response()->json($results->values());
     }
 }
