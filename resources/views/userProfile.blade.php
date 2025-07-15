@@ -69,7 +69,7 @@
                 <span id="private-badge" style="display:none" class="text-xs text-red-500 font-semibold mb-2">This
                     account is private</span>
                 @if($already_followed)
-                    <button id="follow-btn" class="bg-gray-400 cursor-default text-white font-semibold px-6 py-2 rounded-full shadow transition text-sm mt-2 w-32" disabled>Following</button>
+                    <button id="unfollow-btn" class="bg-gray-400 cursor-pointer text-white font-semibold px-6 py-2 rounded-full shadow transition text-sm mt-2 w-32">Following</button>
                 @else
                     <button id="follow-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-full shadow transition text-sm mt-2 w-32">Follow</button>
                 @endif
@@ -303,7 +303,33 @@
                     });
             });
         }
+        const unfollowBtn = document.getElementById('unfollow-btn');
+        if (unfollowBtn) {
+            unfollowBtn.addEventListener('click', function() {
+                const userId = {{ $user->id }};
+                fetch(`/delete_follow/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Reload lại trang để cập nhật trạng thái
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Unfollow failed!');
+                    }
+                })
+                .catch(() => {
+                    alert('Unfollow failed!');
+                });
+            });
+        }
     });
+
 </script>
 
 </html>

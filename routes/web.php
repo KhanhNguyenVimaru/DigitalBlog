@@ -44,5 +44,6 @@ Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail'])->nam
 Route::get('/user-profile/{id}', [UserController::class, 'userProfile'])->name('userProfile')->middleware(accessUserProfile::class);
 // suggest search
 Route::get('/search-suggest', [UserController::class, 'searchSuggest'])->name('search.suggest');
-// Follow user
+// Follow/Unfollow user
 Route::get('/follow_user/{id}',[FollowUserController::class, 'followUser'])->name('followUser')->middleware('auth');
+Route::delete('/delete_follow/{id}', [FollowUserController::class, 'deleteFollow'])->name('deleteFollow')->middleware('auth');
