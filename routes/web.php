@@ -15,7 +15,7 @@ Route::get('/page_login', function () {return view('login');})->name('login');
 Route::get('/page_signup', function () {return view('signup');})->name('signup');
 Route::get('/page_account', function () {return view('account');})->name('account')->middleware('auth');
 Route::get('/signup-success', function () { return view('signup_success'); });
-Route::get('/my-profile', function () { return view('myProfile');})->name('myProfile')->middleware('auth');
+Route::get('/my-profile', [UserController::class, 'myProfile'])->name('myProfile')->middleware('auth');
 Route::get('/writing', function () { return view('writing');})->name('writing')->middleware('auth');
 Route::get('/post-content-viewer/{id}', [App\Http\Controllers\PostController::class, 'viewContentJson'])->name('post.content.viewer');
 Route::get('/user-profile/{id}', [UserController::class, 'userProfile'])->name('userProfile')->middleware(accessUserProfile::class);// User profile
@@ -68,3 +68,6 @@ Route::match(['get', 'post'], '/fetchUrl', function(Request $request) {
         return response()->json(['success' => 0, 'message' => 'Error: ' . $e->getMessage()]);
     }
 });
+
+Route::get('/my-followers', [App\Http\Controllers\UserController::class, 'getFollowers'])->middleware('auth');
+Route::get('/my-following', [App\Http\Controllers\UserController::class, 'getFollowing'])->middleware('auth');

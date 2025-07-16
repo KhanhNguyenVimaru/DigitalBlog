@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class followUser extends Model
 {
-    /** @use HasFactory<\Database\Factories\FollowUserFactory> */
     use HasFactory;
+
+    public function follower()
+    {
+        return $this->belongsTo(User::class, 'followerId');
+    }
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'authorId');
+    }
 }

@@ -20,6 +20,9 @@ class accessUserProfile
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
         $user = User::find($request->route('id'));
         if (!$user || $user->banned) {
             return response()->view('404', [], 404);

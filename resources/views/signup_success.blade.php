@@ -14,6 +14,5 @@
             We have sent a verification email to your inbox.<br>
             Please check your email and click the verification link to activate your account.</p>
     </div>
-    @include('footer')
 </body>
 </html> 

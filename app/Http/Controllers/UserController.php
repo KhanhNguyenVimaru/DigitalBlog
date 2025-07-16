@@ -11,7 +11,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Group;
 use App\Models\Post;
-
+use App\Models\followUser;
 class UserController extends Controller
 {
     public function userProfile(Request $request, $id)
@@ -21,7 +21,24 @@ class UserController extends Controller
         $already_followed = $request->get('already_followed', false);
         $request_sent = $request->get('request_sent', false);
         $can_request_again = $request->get('can_request_again', false);
-        return view('userProfile', compact('user', 'private_profile', 'already_followed', 'request_sent', 'can_request_again'));
+
+        $count_follower = followUser::where('authorId', $user->id)->count();
+        $count_following = followUser::where('followerId', $user->id)->count();
+
+        $followers = followUser::where('authorId', $user->id)->with('follower')->get();
+        $following = followUser::where('followerId', $user->id)->with('author')->get();
+
+        return view('userProfile', compact('user', 'private_profile', 'already_followed', 'request_sent', 'can_request_again', 'count_follower', 'count_following', 'followers', 'following'));
+    }
+
+    public function myProfile(Request $request)
+    {
+        $user = Auth::user();
+        $count_follower = \App\Models\followUser::where('authorId', $user->id)->count();
+        $count_following = \App\Models\followUser::where('followerId', $user->id)->count();
+        $followers = \App\Models\followUser::where('authorId', $user->id)->with('follower')->get();
+        $following = \App\Models\followUser::where('followerId', $user->id)->with('author')->get();
+        return view('myProfile', compact('user', 'count_follower', 'count_following', 'followers', 'following'));
     }
 
     public function content(): Content

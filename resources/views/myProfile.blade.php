@@ -79,11 +79,11 @@
             <div class="flex flex-row justify-center gap-12 w-full">
                 <div class="flex flex-row gap-8">
                     <a href="#" id="followers-link" class="text-center">
-                        <div class="text-lg font-bold text-gray-800">{{ $user->followers_count ?? 0 }}</div>
+                        <div class="text-lg font-bold text-gray-800">{{ $count_follower ?? 0 }}</div>
                         <div class="text-xs text-gray-500 uppercase tracking-wide">Followers</div>
                     </a>
                     <a href="#" id="following-link" class="text-center">
-                        <div class="text-lg font-bold text-gray-800">{{ $user->following_count ?? 0 }}</div>
+                        <div class="text-lg font-bold text-gray-800">{{ $count_following ?? 0 }}</div>
                         <div class="text-xs text-gray-500 uppercase tracking-wide">Following</div>
                     </a>
                 </div>
@@ -100,14 +100,27 @@
         class="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 transition-opacity duration-300 opacity-0 pointer-events-none">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-start sm:p-0 w-full">
             <div id="modal-followers-panel"
-                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg opacity-0 scale-95 translate-y-4 sm:translate-y-0 sm:scale-95 duration-300">
+                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 w-1/2 sm:max-w-2xl opacity-0 scale-95 translate-y-4 sm:translate-y-0 sm:scale-95 duration-300">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-base font-semibold text-gray-900">Followers</h3>
-                    <!-- Nội dung modal followers -->
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Followers</h3>
+                    @if($followers->isEmpty())
+                        <div class="text-gray-500 text-lg">No followers yet.</div>
+                    @else
+                        @foreach($followers as $item)
+                            @php $f = $item->follower; @endphp
+                            <a href="{{ route('userProfile', ['id' => $f->id]) }}" class="flex items-center gap-4 p-4 hover:bg-gray-50 transition rounded cursor-pointer">
+                                <img src="{{ $f->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}" class="w-14 h-14 rounded-full object-cover border" alt="avatar">
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-lg text-gray-800">{{ $f->name }}</span>
+                                    <span class="text-base text-gray-500">{{ $f->email }}</span>
+                                </div>
+                            </a>
+                        @endforeach
+                    @endif
                 </div>
                 <div class="bg-gray-50 px-4 py-3 flex justify-end">
                     <button type="button"
-                        class="mt-3 inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 cursor-pointer"
+                        class="mt-3 inline-flex justify-center rounded-md bg-white px-3 py-2 text-base font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 cursor-pointer"
                         onclick="closeModal('modal-followers')">Close</button>
                 </div>
             </div>
@@ -118,14 +131,27 @@
         class="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 transition-opacity duration-300 opacity-0 pointer-events-none">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-start sm:p-0 w-full">
             <div id="modal-following-panel"
-                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg opacity-0 scale-95 translate-y-4 sm:translate-y-0 sm:scale-95 duration-300">
+                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 w-1/2 sm:max-w-2xl opacity-0 scale-95 translate-y-4 sm:translate-y-0 sm:scale-95 duration-300">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-base font-semibold text-gray-900">Following</h3>
-                    <!-- Nội dung modal following -->
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Following</h3>
+                    @if($following->isEmpty())
+                        <div class="text-gray-500 text-lg">No following yet.</div>
+                    @else
+                        @foreach($following as $item)
+                            @php $a = $item->author; @endphp
+                            <a href="{{ route('userProfile', ['id' => $a->id]) }}" class="flex items-center gap-4 p-4 hover:bg-gray-50 transition rounded cursor-pointer">
+                                <img src="{{ $a->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}" class="w-14 h-14 rounded-full" alt="avatar">
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-lg text-gray-800">{{ $a->name }}</span>
+                                    <span class="text-base text-gray-500">{{ $a->email }}</span>
+                                </div>
+                            </a>
+                        @endforeach
+                    @endif
                 </div>
                 <div class="bg-gray-50 px-4 py-3 flex justify-end">
                     <button type="button"
-                        class="mt-3 inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 cursor-pointer"
+                        class="mt-3 inline-flex justify-center rounded-md bg-white px-3 py-2 text-base font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 cursor-pointer"
                         onclick="closeModal('modal-following')">Close</button>
                 </div>
             </div>
@@ -215,10 +241,14 @@
             document.getElementById('followers-link').addEventListener('click', function(e) {
                 e.preventDefault();
                 openModal('modal-followers');
+                // Fetch followers
+                // Xoá đoạn fetch API followers/following trong JS
             });
             document.getElementById('following-link').addEventListener('click', function(e) {
                 e.preventDefault();
                 openModal('modal-following');
+                // Fetch following
+                // Xoá đoạn fetch API followers/following trong JS
             });
             var privacyBadge = document.querySelector('.bg-indigo-100.text-indigo-700, .bg-gray-200.text-gray-700');
             if (privacyBadge) {
