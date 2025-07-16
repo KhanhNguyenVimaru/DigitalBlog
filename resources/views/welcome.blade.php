@@ -275,3 +275,5 @@
         @endif
     </body>
 </html>
+
+@include('footer')

@@ -55,6 +55,16 @@ const editor = new EditorJS({
       class: LinkTool,
       config: {
         endpoint: '/fetchUrl',
+        fetch: (url) => {
+          return fetch('/fetchUrl', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': meta.content
+            },
+            body: JSON.stringify({ url })
+          }).then(res => res.json());
+        }
       }
     },
   },

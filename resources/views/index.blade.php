@@ -12,9 +12,9 @@
 <body>
     {{-- <h1 class="text-3xl font-bold text-blue-500">Hello Tailwind!</h1> --}}
     @include('header')
-    <div class = "container mx-auto px-4">
-        @yield('content')
+    <div class = "container mx-auto px-4" style="height: 100vh">
     </div>
+    @include('footer')
 </body>
 
 </html>

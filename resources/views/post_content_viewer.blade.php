@@ -119,5 +119,6 @@
             renderPostContent('editorjs-render', window.contentData);
         }
     </script>
+    @include('footer')
 </body>
 </html> 

@@ -52,7 +52,7 @@
 
 <body class="bg-gray-100 min-h-screen">
     @include('header')
-    <div class="flex flex-row justify-center w-full relative gap-6">
+    <div class="flex flex-row justify-center w-full gap-6">
         <!-- Account Info -->
         <div class="max-w-xs w-full mt-8 p-8 bg-white rounded-lg shadow-md flex flex-col items-center gap-8 mx-10 mr-4">
             <!-- Avatar -->
@@ -433,6 +433,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.30.8/dist/editorjs.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @include('footer')
 </body>
 
 </html>

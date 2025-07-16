@@ -7,6 +7,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Middleware\accessUserProfile;
 use App\Http\Controllers\FollowUserController;
+use Illuminate\Http\Request;
 
 // PAGE UI
 Route::get('/', function () {return view('index');})->middleware('auth');
@@ -41,3 +42,29 @@ Route::get('/content-of-author/{id}', [PostController::class, 'contentOfAuthor']
 Route::get('/follow_user/{id}',[FollowUserController::class, 'followUser'])->name('followUser')->middleware('auth');
 Route::delete('/delete_follow/{id}', [FollowUserController::class, 'deleteFollow'])->name('deleteFollow')->middleware('auth');
 Route::delete('/revoke_follow_request/{id}', [App\Http\Controllers\FollowUserController::class, 'revokeFollowRequest'])->name('revokeFollowRequest');
+
+Route::match(['get', 'post'], '/fetchUrl', function(Request $request) {
+    $url = $request->input('url') ?? $request->query('url');
+    if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        return response()->json(['success' => 0, 'message' => 'Invalid URL']);
+    }
+    try {
+        $html = @file_get_contents($url);
+        if (!$html) {
+            return response()->json(['success' => 0, 'message' => 'Cannot fetch URL']);
+        }
+        preg_match('/<title>(.*?)<\\/title>/si', $html, $title);
+        preg_match('/<meta name="description" content="(.*?)"/si', $html, $desc);
+        preg_match('/<meta property="og:image" content="(.*?)"/si', $html, $img);
+        return response()->json([
+            'success' => 1,
+            'meta' => [
+                'title' => $title[1] ?? $url,
+                'description' => $desc[1] ?? '',
+                'image' => $img[1] ?? '',
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['success' => 0, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+});

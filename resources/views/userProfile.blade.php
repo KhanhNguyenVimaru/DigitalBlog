@@ -169,7 +169,7 @@
         </div>
     </div>
 
-    <div class="w-full h-20"></div>
+    <div class="w-full h-35"></div>
 
     @if (!$private_profile)
         <script>
@@ -336,6 +336,7 @@
                     .catch(() => {
                         alert('Follow failed!');
                     });
+                    location.reload();
             });
         }
         const unfollowBtn = document.getElementById('unfollow-btn');
@@ -392,3 +393,4 @@
 </script>
 
 </html>
+@include('footer')
