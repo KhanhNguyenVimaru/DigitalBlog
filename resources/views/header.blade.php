@@ -13,9 +13,11 @@
             <a href="/" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Feed</a>
             <a href="/writing" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Writing</a>
             <a href="#" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Community</a>
-            <a href="#" id="notification-bell" class="text-sm font-semibold text-gray-600 hover:text-black px-4 relative">Notification
-                <div id="notification-dropdown" class="hidden absolute left-0 mt-2 w-80 bg-white border border-gray-200 rounded shadow-lg z-50 p-4">
-                    <div class="font-semibold text-gray-700 mb-2">Notifications</div>
+            <a href="#" id="notification-bell"
+                class="text-sm font-semibold text-gray-600 hover:text-black px-4 relative">Notification
+                <div id="notification-dropdown"
+                    class="hidden absolute left-0 mt-2 w-120 bg-white border border-gray-200 rounded shadow-lg z-50 p-4">
+                    <div class="font-semibold text-black mb-2">Notifications</div>
                     <div class="text-gray-500 text-sm">No notifications yet.</div>
                 </div>
             </a>
@@ -72,6 +74,9 @@
 <script src="/js/logout.js"></script>
 <script src="/js/search_suggest.js"></script>
 <script>
+    window.userProfileUrlBase = "{{ url('/user-profile') }}/";
+</script>
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         const loginLink = document.getElementById('login-link');
         const accountWrapper = document.getElementById('account-dropdown-wrapper');
@@ -101,7 +106,11 @@
             // Toggle dropdown khi click vào account
             accountLink.addEventListener('click', function(e) {
                 e.preventDefault();
-                accountDropdown.classList.toggle('block');
+                if (accountDropdown.classList.contains('hidden')) {
+                    accountDropdown.classList.remove('hidden');
+                } else {
+                    accountDropdown.classList.add('hidden');
+                }
             });
         }
         // Search nav-link logic
@@ -137,13 +146,132 @@
             bell.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                dropdown.classList.toggle('hidden');
+                // Fetch notify mỗi lần click chuông
+                fetch('/loadUserNotify', {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(notifies => {
+                        let html =
+                            '<div class="font-semibold text-gray-700 mb-2">Notifications</div>';
+                        if (!notifies.length) {
+                            html +=
+                            '<div class="text-gray-500 text-sm">No notifications yet.</div>';
+                        } else {
+                            html += notifies.map(n => {
+                                let userSentId = n.send_from_id;
+                                if (n.type === 'follow_request') {
+                                    return `<div 
+                                    class="flex items-center justify-between gap-2 py-2 hover:bg-gray-50 h-[40px]"
+                                    onclick="window.location.href='${window.userProfileUrlBase}${userSentId}'">
+                                    <span class="text-sm text-gray-600 flex-1">${n.notify_content || 'You have a new follow request.'}</span>
+                                    <button class="cursor-pointer hover:bg-blue-300 accept-follow-btn bg-blue-500 text-white px-2 py-1 rounded text-xs mr-1" data-id="${n.id}" onclick = "acceptRequest(${n.id}, ${n.send_from_id})">Accept</button>
+                                    <button class="cursor-pointer hover:bg-gray-300 reject-follow-btn bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs" data-id="${n.id}" onclick = "denyRequest(${n.id}, ${n.send_from_id})">X</button>
+                                </div>`;
+                                } else {
+                                    return `<div onclick="window.location.href='${window.userProfileUrlBase}${userSentId}'" class="h-[40px] text-sm py-2 cursor-pointer hover:bg-gray-50 text-gray-600">${n.notify_content || 'You have a new notification.'}</div>`;
+                                }
+                            }).join('');
+                        }
+                        dropdown.innerHTML = html;
+                        dropdown.classList.toggle('hidden');
+                    });
             });
             document.addEventListener('click', function(e) {
                 if (!dropdown.contains(e.target) && !bell.contains(e.target)) {
                     dropdown.classList.add('hidden');
                 }
             });
+
         }
     });
+</script>
+<script>
+    function denyRequest(id, sendFromId) {
+        if (!id || !sendFromId) return;
+        fetch(`/deny-request`, {
+                method: 'DELETE',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').getAttribute('content'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: id,
+                    send_from_id: sendFromId
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Đổi nút X thành span Rejected
+                    const btn = document.querySelector(`button.reject-follow-btn[data-id='${id}']`);
+                    if (btn) {
+                        const span = document.createElement('span');
+                        span.className = 'ml-2 text-xs text-gray-400 font-semibold';
+                        span.innerText = 'Rejected';
+                        btn.replaceWith(span);
+                    }
+                } else {
+                    alert(data.message || 'Error denying request!');
+                }
+            })
+            .catch(() => {
+                alert('Error denying request!');
+            });
+    }
+</script>
+<script>
+    function acceptRequest(id, sendFromId) {
+        if (!id || !sendFromId) return;
+        fetch(`/accept-request`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').getAttribute('content'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: id,
+                    send_from_id: sendFromId
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const btn = document.querySelector(`button.accept-follow-btn[data-id='${id}']`);
+                    if (btn) {
+                        const span = document.createElement('span');
+                        span.className = 'ml-2 text-xs text-green-500 font-semibold';
+                        span.innerText = 'Accepted';
+                        btn.replaceWith(span);
+                    }
+                    // Gọi fetch xóa notify
+                    fetch(`/delete-notify`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']')
+                                .getAttribute('content'),
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            id: id,
+                        })
+                    });
+                } else {
+                    alert(data.message || 'Error accepting request!');
+                }
+            })
+            .catch(() => {
+                alert('Error accepting request!');
+            });
+    }
 </script>

@@ -8,13 +8,54 @@ use App\Http\Requests\UpdatefollowUserRequest;
 use App\Models\User;
 use App\Models\followRequest;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Notify;
+use Illuminate\Http\Request;
+
 
 class FollowUserController extends Controller
 {
-    public function deleteFollow($id){
+   public function acceptRequest(Request $request)
+    {
+        try {
+            $my_id = Auth::id();
+            $send_from_id = $request->send_from_id;
+
+            $request_accepted = new followUser();
+            $request_accepted->authorId = $my_id;
+            $request_accepted->followerId = $send_from_id;
+            $request_accepted->save();
+
+            $get_accpeted = new Notify();
+            $get_accpeted->send_from_id = $my_id;
+            $get_accpeted->send_to_id = $send_from_id;
+            $get_accpeted->type = "accepted";
+            $get_accpeted->notify_content = Auth::user()->name . " has accpeted your request";
+            $get_accpeted->save();
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    public function denyRequest(Request $request)
+    {
+        $send_from_id = $request->send_from_id;
+        $notify_id = $request->id;
+        try {
+            $remove_request = followRequest::where('followedId', Auth::id())->where('userId_request', $send_from_id)->delete();
+            $remove_notify = Notify::where('id', $notify_id)->delete();
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    public function deleteFollow($id)
+    {
         $myId = Auth::user()->id;
         try {
-            $deleted = \App\Models\followUser::where('authorId', $id)
+            $deleted = followUser::where('authorId', $id)
                 ->where('followerId', $myId)
                 ->delete();
             if ($deleted) {
@@ -59,6 +100,15 @@ class FollowUserController extends Controller
                 $queue->followedId = $userId;
                 $queue->userId_request = $myId;
                 $queue->save();
+
+                $notify = new Notify();
+                $notify->send_from_id = $myId;
+                $notify->send_to_id = $userId;
+                $notify->type = 'follow_request';
+                $username = User::where('id', $myId)->value('name');
+                $notify->notify_content = $username . ' has sent you a follow request';
+                $notify->save();
+
                 return response()->json(['type' => 'request', 'success' => true, 'message' => "Request has been sent"]);
             } catch (\Exception $e) {
                 return response()->json(['type' => 'request', 'success' => false, 'message' => 'Error: ' . $e->getMessage()]);
@@ -69,6 +119,15 @@ class FollowUserController extends Controller
                 $relation->authorId = $userId;
                 $relation->followerId = $myId;
                 $relation->save();
+
+                $notify = new Notify();
+                $notify->send_from_id = $myId;
+                $notify->send_to_id = $userId;
+                $notify->type = 'follow';
+                $username = User::where('id', $myId)->value('name');
+                $notify->notify_content = $username . ' is following you';
+                $notify->save();
+
                 return response()->json(['type' => 'follow', 'success' => true, 'message' => "Follow user completed!"]);
             } catch (\Exception $e) {
                 return response()->json(['type' => 'follow', 'success' => false, 'message' => 'Error: ' . $e->getMessage()]);

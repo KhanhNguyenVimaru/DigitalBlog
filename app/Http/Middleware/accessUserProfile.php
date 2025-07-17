@@ -27,6 +27,9 @@ class accessUserProfile
         if (!$user || $user->banned) {
             return response()->view('404', [], 404);
         }
+        if($user->id === Auth::id()) {
+            return redirect()->route('myProfile');
+        }
         $pagePrivacy = $user->privacy;
         $authorId = $user->id;
         $followerId = Auth::user()->id;

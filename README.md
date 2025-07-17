@@ -32,3 +32,4 @@ Features are being added and improved continuously.
 <!-- php artisan serve -->
 <!-- npm run dev -->
 <!-- php artisan reverb:start -->
+<!-- php artisan queue:work -->

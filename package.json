@@ -30,6 +30,7 @@
         "@editorjs/raw": "^2.5.1",
         "@editorjs/simple-image": "^1.6.0",
         "cropperjs": "^1.5.13",
+        "socket.io-client": "^4.8.1",
         "ws": "^8.18.3"
     }
 }

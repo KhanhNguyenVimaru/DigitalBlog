@@ -13,7 +13,35 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    public function updateStatus($id){
+    public function loadLink($request)
+    {
+        $url = $request->input('url') ?? $request->query('url');
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return response()->json(['success' => 0, 'message' => 'Invalid URL']);
+        }
+        try {
+            $html = @file_get_contents($url);
+            if (!$html) {
+                return response()->json(['success' => 0, 'message' => 'Cannot fetch URL']);
+            }
+            preg_match('/<title>(.*?)<\\/title>/si', $html, $title);
+            preg_match('/<meta name="description" content="(.*?)"/si', $html, $desc);
+            preg_match('/<meta property="og:image" content="(.*?)"/si', $html, $img);
+            return response()->json([
+                'success' => 1,
+                'meta' => [
+                    'title' => $title[1] ?? $url,
+                    'description' => $desc[1] ?? '',
+                    'image' => $img[1] ?? '',
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => 0, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    public function updateStatus($id)
+    {
         $post = post::findOrFail($id);
         if ($post->authorId !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -32,13 +60,13 @@ class PostController extends Controller
         $post = post::findOrFail($id);
         if ($post->authorId !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized']);
-        }                           
+        }
         DB::beginTransaction();
         try {
             // Xóa nội dung dài nếu có
             if ($post->long_content()->exists()) {
                 $post->long_content()->delete();
-            }   
+            }
             // Xóa bài viết
             $post->delete();
             DB::commit();
@@ -139,7 +167,8 @@ class PostController extends Controller
         }
     }
 
-    public function contentOfUsers(Request $request){
+    public function contentOfUsers(Request $request)
+    {
         $userId = Auth::id();
         $posts = post::where('authorId', $userId)
             ->with(['category', 'long_content'])
@@ -149,7 +178,8 @@ class PostController extends Controller
         return response()->json($posts);
     }
 
-    public function contentOfAuthor($id){
+    public function contentOfAuthor($id)
+    {
         $posts = post::where('authorId', $id)
             ->where('status', 'public') // Chỉ lấy bài viết công kha
             ->with(['category', 'long_content'])

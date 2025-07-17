@@ -9,7 +9,6 @@
     <link rel="icon" type="image/x-icon" href="https://www.svgrepo.com/show/475713/blog.svg" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-
 <body class="bg-gray-100 min-h-screen">
     @include('header')
     <div class="flex justify-center items-start min-h-[calc(100vh-64px)] p-0">
@@ -66,13 +65,13 @@
                 <form class="space-y-4" method="POST" action="{{ route('updateUserData', $user->id) }}">
                     @csrf
                     @method('PATCH')
-                    
+
                     @if (session('success'))
                         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded text-base">
                             {{ session('success') }}
                         </div>
                     @endif
-                    
+
                     @if ($errors->any())
                         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-base">
                             <ul class="list-disc list-inside">
@@ -82,11 +81,12 @@
                             </ul>
                         </div>
                     @endif
-                    
+
                     <!-- Privacy -->
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-600">Privacy</label>
-                        <select class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full text-base"
+                        <select
+                            class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full text-base"
                             style="height: 40px; important;" name = "privacy" value = "{{ $user->privacy }}">
                             <option value="public" {{ old('privacy', $user->privacy) == 'public' ? 'selected' : '' }}>
                                 Public</option>
@@ -98,8 +98,8 @@
                     <!-- Description -->
                     <div class="mb-0">
                         <label class="block mb-2 text-sm font-medium text-gray-600">Description</label>
-                        <textarea class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full resize-none text-base" rows="4"
-                            placeholder="Description (max 255 characters)" name="description" maxlength="255">{{ old('description', $user->description) }}</textarea>
+                        <textarea class="bg-gray-50 border border-gray-200 text-gray-600 rounded px-3 py-2 w-full resize-none text-base"
+                            rows="4" placeholder="Description (max 255 characters)" name="description" maxlength="255">{{ old('description', $user->description) }}</textarea>
                         <div class="text-sm text-gray-500 mt-1">
                             <span id="char-count">0</span>/255 characters
                         </div>
@@ -193,17 +193,17 @@
             // Character count for description
             const descriptionTextarea = document.querySelector('textarea[name="description"]');
             const charCount = document.getElementById('char-count');
-            
+
             if (descriptionTextarea && charCount) {
                 // Set initial count
                 charCount.textContent = descriptionTextarea.value.length;
-                
+
                 // Update count on input
                 descriptionTextarea.addEventListener('input', function() {
                     charCount.textContent = this.value.length;
                 });
             }
-            
+
             const logoutForm = document.getElementById('logout-form-account');
             const deleteAccountForm = document.getElementById('delete-account-form');
             const changePasswordForm = document.getElementById('change-password-form');
@@ -334,7 +334,7 @@
                                     showConfirmButton: true
                                 }).then(() => {
                                     window.location.href =
-                                    '/page_account'; // Redirect to account page after successful change
+                                        '/page_account'; // Redirect to account page after successful change
                                 });
                             } else {
                                 response.json().then(data => {
@@ -377,6 +377,98 @@
                     window.location.href = '/page_login';
                 }
             });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Avatar crop logic
+            const avatarInput = document.getElementById('avatarInput');
+            const avatarPreview = document.getElementById('avatarPreview');
+            let cropper;
+            let cropModal = document.getElementById('cropModal');
+            let cropBtn = document.getElementById('cropBtn');
+            let cropImage = document.getElementById('cropImage');
+
+            if (avatarInput) {
+                avatarInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            cropImage.src = event.target.result;
+                            cropModal.style.display = 'flex';
+                            if (cropper) cropper.destroy();
+                            cropper = new Cropper(cropImage, {
+                                aspectRatio: 1,
+                                viewMode: 1,
+                                preview: avatarPreview
+                            });
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+            if (cropBtn) {
+                cropBtn.addEventListener('click', function() {
+                    if (cropper) {
+                        const canvas = cropper.getCroppedCanvas({
+                            width: 256,
+                            height: 256
+                        });
+                        canvas.toBlob(function(blob) {
+                            const formData = new FormData();
+                            formData.append('avatar', blob, 'avatar.png');
+                            fetch('/update-avatar', {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': getCsrfToken(),
+                                    },
+                                    body: formData
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success && data.avatar_url) {
+                                        avatarPreview.src = data.avatar_url + '?t=' + Date
+                                    .now();
+                                    } else {
+                                        alert('Upload failed!');
+                                    }
+                                })
+                                .catch(() => alert('Upload failed!'));
+                        }, 'image/png');
+                        cropModal.style.display = 'none';
+                        if (cropper) cropper.destroy();
+                    }
+                });
+            }
+            // Close modal on click outside
+            if (cropModal) {
+                cropModal.addEventListener('click', function(e) {
+                    if (e.target === cropModal) {
+                        cropModal.style.display = 'none';
+                        if (cropper) cropper.destroy();
+                    }
+                });
+            }
+            if (avatarInput && avatarPreview) {
+                avatarPreview.addEventListener('click', function() {
+                    avatarInput.click();
+                });
+            }
+            // Dropdown cho desktop (account)
+            const accountLink = document.getElementById('account-link');
+            const accountDropdown = document.getElementById('account-dropdown');
+            if (accountLink && accountDropdown) {
+                accountLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    accountDropdown.classList.toggle('hidden');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!accountDropdown.contains(e.target) && !accountLink.contains(e.target)) {
+                        accountDropdown.classList.add('hidden');
+                    }
+                });
+            }
         });
     </script>
 </body>
