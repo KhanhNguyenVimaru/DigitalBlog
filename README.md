@@ -18,7 +18,6 @@ Features are being added and improved continuously.
 **Laravel**  
 &nbsp;&nbsp;&nbsp;&nbsp;- Laravel Passport  
 &nbsp;&nbsp;&nbsp;&nbsp;- Laravel Mail
-&nbsp;&nbsp;&nbsp;&nbsp;- Laravel Reverb
 
 **JavaScript**  
 &nbsp;&nbsp;&nbsp;&nbsp;- Cropper.js  
