@@ -41,11 +41,13 @@
 
         .post-title-hover {
             transition: color 0.2s;
+            cursor: pointer;
         }
 
         .post-title-hover:hover {
             color: #2563eb;
-            /* blue-600 */
+            text-decoration: none !important;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -72,8 +74,8 @@
             </div>
             <!-- User name & email -->
             <div class="flex flex-col items-center mb-2">
-                <h2 class="text-2xl font-bold">{{ $user->name }}</h2>
-                <span class="text-gray-500 text-base">{{ $user->email }}</span>
+                <h2 class="text-xl font-bold text-gray-800">{{ $user->name }}</h2>
+                <span class="text-base text-gray-500">{{ $user->email }}</span>
             </div>
             <!-- Follower/Following row -->
             <div class="flex flex-row justify-center gap-12 w-full">
@@ -164,7 +166,7 @@
             <div id="modal-privacy-panel"
                 class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg opacity-0 scale-95 translate-y-4 sm:translate-y-0 sm:scale-95 duration-300">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-base font-semibold text-gray-900 mb-3">Privacy</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Privacy</h3>
                     <!-- Nội dung modal privacy -->
                     <div class="text-gray-700 text-sm leading-relaxed">
                         <p class="mb-4 text-left">
@@ -174,13 +176,13 @@
                             In contrast, users with <span class="font-semibold text-gray-900">Public</span> accounts can
                             be followed instantly without requiring any approval.
                         </p>
-                        <span class="text-left block">Want to reset your privacy? <a href="/page_account"
+                        <span class="text-left block text-sm">Want to reset your privacy? <a href="/page_account"
                                 class="text-indigo-600 font-semibold hover:underline transition">Setting here</a></span>
                     </div>
                 </div>
                 <div class="bg-gray-50 px-4 py-3 flex justify-end">
                     <button type="button"
-                        class="mt-3 inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 cursor-pointer"
+                        class="mt-3 inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 cursor-pointer"
                         onclick="closeModal('modal-privacy')">Close</button>
                 </div>
             </div>
@@ -299,8 +301,8 @@
                         <div class="flex flex-row items-center mb-2 justify-between">
                             <div class="flex items-center gap-3">
                                 <img src="${coverImg}" alt="cover" class="w-22 h-22 object-cover rounded-md border border-gray-200 bg-gray-100" style="aspect-ratio:1/1;">
-                                <a href="/post-content-viewer/${post.id}" class="font-bold text-lg text-gray-800 cursor-pointer post-title-hover hover:underline">${post.title || 'lỗi gì đó'}</a>
-                            </div>  
+                                <a href="/post-content-viewer/${post.id}" class="font-bold text-base text-gray-800 cursor-pointer post-title-hover">${post.title || 'lỗi gì đó'}</a>
+                            </div>
                             <div class="relative cursor-pointer">
                                 <button id="${btnId}" class="p-2 rounded-full hover:bg-gray-200 focus:outline-none cursor-pointer" title="Actions" type="button">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-500 cursor-pointer">
@@ -317,11 +319,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex flex-row items-center gap-2 mb-2 cursor-pointer">
-                            <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold cursor-pointer">${categoryName}</span>
-                            <span class="px-2 py-1 rounded text-xs ${post.status === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'} cursor-pointer">${status}</span>
+                        <div class="flex flex-row items-center justify-between mb-2 w-full">
+                            <div class="flex flex-row items-center gap-2">
+                                <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold cursor-pointer">${categoryName}</span>
+                                <span class="px-2 py-1 rounded text-xs ${post.status === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'} cursor-pointer">${status}</span>
+                            </div>
+                            <div class="text-xs text-gray-400 cursor-pointer">${createdAt}</div>
                         </div>
-                        <div class="text-xs text-gray-400 mt-auto cursor-pointer">${createdAt}</div>
                         `;
                         postsList.appendChild(postDiv);
                         // Sự kiện mở dropdown cho từng post
