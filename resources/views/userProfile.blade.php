@@ -384,7 +384,6 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        // Reload lại trang để cập nhật trạng thái
                         location.reload();
                     } else {
                         alert(data.message || 'Unfollow failed!');

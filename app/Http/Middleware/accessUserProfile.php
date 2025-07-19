@@ -20,11 +20,13 @@ class accessUserProfile
      */
     public function handle(Request $request, Closure $next): Response
     {
+        
         if (!Auth::check()) {
             return redirect()->route('login');
         }
         $user = User::find($request->route('id'));
-        if (!$user || $user->banned) {
+        if (!$user) { 
+            // sau này bổ sung return 404 khi ban 
             return response()->view('404', [], 404);
         }
         if($user->id === Auth::id()) {
@@ -45,6 +47,7 @@ class accessUserProfile
         $requestSent = followRequest::where('followedId', $authorId)
             ->where('userId_request', $followerId)
             ->exists();
+
         if ($requestSent && !$alreadyFollowed) {
             $request->merge(['request_sent' => true]);
         }

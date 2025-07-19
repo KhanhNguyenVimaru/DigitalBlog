@@ -20,10 +20,15 @@ class FollowUserController extends Controller
             $my_id = Auth::id();
             $send_from_id = $request->send_from_id;
 
+            // lưu request sang follow user
             $request_accepted = new followUser();
             $request_accepted->authorId = $my_id;
             $request_accepted->followerId = $send_from_id;
             $request_accepted->save();
+            // xóa request
+            // denyRequest($request);
+            $remove_request = followRequest::where('followedId', Auth::id())->where('userId_request', $send_from_id)->delete();
+
 
             $get_accpeted = new Notify();
             $get_accpeted->send_from_id = $my_id;
