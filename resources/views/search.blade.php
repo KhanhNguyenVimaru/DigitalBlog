@@ -1,15 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="icon" type="image/x-icon" href="https://www.svgrepo.com/show/475713/blog.svg" />
+    <title>Search - Blog</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
 @php use Illuminate\Support\Str; @endphp
-@vite(['resources/css/app.css', 'resources/js/app.js'])
 @include('header')
 
 <div class="container mx-auto py-8 flex justify-center bg-gray-100" style="min-height:90vh">
-    <div class="w-3/5 bg-white rounded-lg p-8 shadow-md">
+    <div class="w-3/5 bg-white rounded-lg p-8 shadow-md" style="width:60%">
         <h5 class="text-lg font-bold mb-4 text-center">Search results for: "{{ $query }}"</h5>
 
         <div class="flex justify-center gap-2 mb-8 w-full max-w-md mx-auto">
-            <button class="filter-btn w-1/3 px-2 py-1 rounded bg-blue-500 text-white text-sm focus:outline-none" data-target="posts">Posts</button>
-            <button class="filter-btn w-1/3 px-2 py-1 rounded bg-blue-500 text-white text-sm focus:outline-none" data-target="users">Users</button>
-            <button class="filter-btn w-1/3 px-2 py-1 rounded bg-blue-500 text-white text-sm focus:outline-none" data-target="categories">Categories</button>
+            <button class="cursor-pointer hover:bg-blue-600 filter-btn flex-1 px-2 py-1 rounded bg-blue-500 text-white text-sm focus:outline-none" data-target="posts">Posts</button>
+            <button class="cursor-pointer hover:bg-blue-600 filter-btn flex-1 px-2 py-1 rounded bg-blue-500 text-white text-sm focus:outline-none" data-target="users">Users</button>
+            <button class="cursor-pointer hover:bg-blue-600 filter-btn flex-1 px-2 py-1 rounded bg-blue-500 text-white text-sm focus:outline-none" data-target="categories">Categories</button>
         </div>
 
         <div id="posts" class="filter-section mb-8">

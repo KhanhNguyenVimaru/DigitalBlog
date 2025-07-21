@@ -12,8 +12,7 @@ class SearchController extends Controller
     public function index(Request $request)
     {
         $query = $request->input('query');
-        $posts = post::where('content', 'like', "%$query%")
-            ->orWhere('title', 'like', "%$query%")
+        $posts = post::where('title', 'like', "%$query%")
             ->get();
         $users = User::where('name', 'like', "%$query%")
             ->orWhere('email', 'like', "%$query%")
