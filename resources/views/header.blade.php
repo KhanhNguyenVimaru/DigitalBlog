@@ -135,7 +135,10 @@
             // Optional: Enter để submit search
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
-                    // TODO: Xử lý search
+                    const query = searchInput.value.trim();
+                    if (query) {
+                        window.location.href = '/search?query=' + encodeURIComponent(query);
+                    }
                 }
             });
         }

@@ -9,6 +9,7 @@ use App\Models\Notify;
 use App\Http\Controllers\FollowUserController;
 use App\Http\Controllers\NotifyController;
 use App\Models\followUser;
+use App\Http\Controllers\SearchController;
 
 // PAGE UI
 Route::get('/', function () {return view('index');})->middleware('auth');
@@ -41,6 +42,7 @@ Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail'])->nam
 Route::get('/search-suggest', [UserController::class, 'searchSuggest'])->name('search.suggest');// suggest search
 Route::get('/content-of-author/{id}', [PostController::class, 'contentOfAuthor'])->name('contentOfAuthor'); //  content of author là bài viết của người dùng khác
 Route::match(['get', 'post'], '/fetchUrl',[PostController::class, 'loadLink'])->name('fetchUrl')->middleware('auth');
+Route::get('/search', [SearchController::class, 'index'])->name('search');
 // FOLLOW/UNFOLLOW USER
 Route::get('/follow_user/{id}',[FollowUserController::class, 'followUser'])->name('followUser')->middleware('auth');
 Route::delete('/delete_follow/{id}', [FollowUserController::class, 'deleteFollow'])->name('deleteFollow')->middleware('auth');
