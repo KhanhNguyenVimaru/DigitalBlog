@@ -12,6 +12,9 @@
 <body>
     {{-- <h1 class="text-3xl font-bold text-blue-500">Hello Tailwind!</h1> --}}
     @include('header')
+    @include('components.breadcrumb', [
+        'links' => \App\Http\Controllers\Controller::generateBreadcrumbLinks()
+    ])
     <div class = "container mx-auto px-4" style="height: 100vh">
     </div>
     @include('footer')

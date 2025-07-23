@@ -54,48 +54,52 @@
 
 <body class="bg-gray-100 min-h-screen">
     @include('header')
-    <div class="flex flex-row justify-center w-full gap-6">
-        <!-- Account Info -->
-        <div class="max-w-xs w-full mt-8 p-8 bg-white rounded-lg shadow-md flex flex-col items-center gap-8 mx-10 mr-4">
-            <!-- Avatar -->
-            <div class="flex flex-col items-center w-full">
-                <img src="{{ $user->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}"
-                    class="w-32 h-32 rounded-full object-cover border-2 border-gray-300 mb-4" alt="Avatar">
-            </div>
-            <!-- Privacy + Edit profile row -->
-            <div class="flex flex-row items-center gap-4 mb-2">
-                @if ($user->privacy === 'public')
-                    <span class="px-3 py-1 rounded-full text-xs bg-indigo-100 text-indigo-700 cursor-pointer" style="cursor: pointer;">{{ $user->privacy }}</span>
-                @else
-                    <span class="px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 cursor-pointer" style="cursor: pointer;">{{ $user->privacy }}</span>
-                @endif
-                <a href="{{ route('account') }}"
-                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-1 rounded transition text-sm">Edit profile</a>
-            </div>
-            <!-- User name & email -->
-            <div class="flex flex-col items-center mb-2">
-                <h2 class="text-xl font-bold text-gray-800">{{ $user->name }}</h2>
-                <span class="text-base text-gray-500">{{ $user->email }}</span>
-            </div>
-            <!-- Follower/Following row -->
-            <div class="flex flex-row justify-center gap-12 w-full">
-                <div class="flex flex-row gap-8">
-                    <a href="#" id="followers-link" class="text-center">
-                        <div class="text-lg font-bold text-gray-800">{{ $count_follower ?? 0 }}</div>
-                        <div class="text-xs text-gray-500 uppercase tracking-wide">Followers</div>
-                    </a>
-                    <a href="#" id="following-link" class="text-center">
-                        <div class="text-lg font-bold text-gray-800">{{ $count_following ?? 0 }}</div>
-                        <div class="text-xs text-gray-500 uppercase tracking-wide">Following</div>
-                    </a>
+    @include('components.breadcrumb', [
+        'links' => \App\Http\Controllers\Controller::generateBreadcrumbLinks(),
+    ])
+    <div class="w-full max-w-7xl mx-auto flex flex-col gap-6 mt-2">
+        <div class="flex flex-col items-start w-full mt-0 pt-0">
+            <div
+                class="mt-2 p-4 rounded-lg flex flex-row items-center gap-6 mb-8 mx-0 pb-8" style="width: calc(33.333% - 1rem);">
+                <!-- Avatar bên trái -->
+                <div class="flex-shrink-0 flex items-center justify-center w-fit h-24">
+                    <img src="{{ $user->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}"
+                        class="w-20 h-20 rounded-full object-cover border border-gray-300 ml-5  " alt="Avatar">
+                </div>
+                <!-- Thông tin bên phải, content fit, căn phải -->
+                <div class="flex flex-col items-start justify-center flex-1 pl-4">
+                    <div class="flex flex-row items-center gap-2 mb-1">
+                        <h2 class="text-base font-bold text-gray-800 truncate">{{ $user->name }}</h2>
+                        @if ($user->privacy === 'public')
+                            <span
+                                class="px-2 py-0.5 rounded-full text-xs bg-indigo-100 text-indigo-700 cursor-pointer">{{ $user->privacy }}</span>
+                        @else
+                            <span
+                                class="px-2 py-0.5 rounded-full text-xs bg-gray-200 text-gray-700 cursor-pointer">{{ $user->privacy }}</span>
+                        @endif
+                        <a href="{{ route('account') }}"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-2 py-0.5 rounded transition text-xs">Edit</a>
+                    </div>
+                    <span class="text-xs text-gray-500 truncate mb-1">{{ $user->email }}</span>
+                    <div class="flex flex-row gap-6 mt-1">
+                        <a href="#" id="followers-link" class="text-center">
+                            <div class="text-base font-bold text-gray-800">{{ $count_follower ?? 0 }}</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wide">Followers</div>
+                        </a>
+                        <a href="#" id="following-link" class="text-center">
+                            <div class="text-base font-bold text-gray-800">{{ $count_following ?? 0 }}</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wide">Following</div>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- Grid for Posts (1 hàng ngang, tự wrap) -->
-        <div class="flex-1 flex flex-col gap-6 mt-8 mx-10 ml-0">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="posts-row-all"></div>
+            <!-- Grid for Posts bên dưới -->
+            <div class="w-full max-w-7xl mx-auto flex flex-col gap-6 mt-2">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="posts-row-all"></div>
+            </div>
         </div>
     </div>
+
 
     <!-- Modal Followers -->
     <div id="modal-followers"
@@ -105,13 +109,15 @@
                 class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 w-1/2 sm:max-w-2xl opacity-0 scale-95 translate-y-4 sm:translate-y-0 sm:scale-95 duration-300">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Followers</h3>
-                    @if($followers->isEmpty())
+                    @if ($followers->isEmpty())
                         <div class="text-gray-500 text-lg">No followers yet.</div>
                     @else
-                        @foreach($followers as $item)
+                        @foreach ($followers as $item)
                             @php $f = $item->follower; @endphp
-                            <a href="{{ route('userProfile', ['id' => $f->id]) }}" class="flex items-center gap-4 p-4 hover:bg-gray-50 transition rounded cursor-pointer">
-                                <img src="{{ $f->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}" class="w-14 h-14 rounded-full object-cover border" alt="avatar">
+                            <a href="{{ route('userProfile', ['id' => $f->id]) }}"
+                                class="flex items-center gap-4 p-4 hover:bg-gray-50 transition rounded cursor-pointer">
+                                <img src="{{ $f->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}"
+                                    class="w-14 h-14 rounded-full object-cover border" alt="avatar">
                                 <div class="flex flex-col">
                                     <span class="font-bold text-lg text-gray-800">{{ $f->name }}</span>
                                     <span class="text-base text-gray-500">{{ $f->email }}</span>
@@ -136,13 +142,15 @@
                 class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 w-1/2 sm:max-w-2xl opacity-0 scale-95 translate-y-4 sm:translate-y-0 sm:scale-95 duration-300">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Following</h3>
-                    @if($following->isEmpty())
+                    @if ($following->isEmpty())
                         <div class="text-gray-500 text-lg">No following yet.</div>
                     @else
-                        @foreach($following as $item)
+                        @foreach ($following as $item)
                             @php $a = $item->author; @endphp
-                            <a href="{{ route('userProfile', ['id' => $a->id]) }}" class="flex items-center gap-4 p-4 hover:bg-gray-50 transition rounded cursor-pointer">
-                                <img src="{{ $a->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}" class="w-14 h-14 rounded-full" alt="avatar">
+                            <a href="{{ route('userProfile', ['id' => $a->id]) }}"
+                                class="flex items-center gap-4 p-4 hover:bg-gray-50 transition rounded cursor-pointer">
+                                <img src="{{ $a->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}"
+                                    class="w-14 h-14 rounded-full" alt="avatar">
                                 <div class="flex flex-col">
                                     <span class="font-bold text-lg text-gray-800">{{ $a->name }}</span>
                                     <span class="text-base text-gray-500">{{ $a->email }}</span>
@@ -197,14 +205,22 @@
     <div class="w-full h-20"></div>
 
     <!-- Spinner loading khi xóa -->
-    <div id="delete-spinner" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:999;background:rgba(255,255,255,0.7);justify-content:center;align-items:center;">
-      <div class="spinner" style="border: 6px solid #f3f3f3; border-top: 6px solid #2563eb; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+    <div id="delete-spinner"
+        style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:999;background:rgba(255,255,255,0.7);justify-content:center;align-items:center;">
+        <div class="spinner"
+            style="border: 6px solid #f3f3f3; border-top: 6px solid #2563eb; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;">
+        </div>
     </div>
     <style>
-    @keyframes spin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
-    }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 
     <script>
@@ -284,182 +300,24 @@
                         let categoryName = post.category ? post.category.content : 'No category';
                         let status = post.status.charAt(0).toUpperCase() + post.status.slice(1);
                         let createdAt = new Date(post.created_at).toLocaleString();
-                        let coverImg = post.additionFile ? post.additionFile : '/images/free-images-for-blog.png';
-
-                        // Tạo khung bài viết
+                        let coverImg = post.additionFile ? post.additionFile :
+                            '/images/free-images-for-blog.png';
                         const postDiv = document.createElement('div');
-                        postDiv.className = 'bg-white rounded-lg shadow p-4 flex flex-col relative';
-                        postDiv.style.minHeight = '120px';
-                        postDiv.style.maxHeight = '216px';
-                        postDiv.style.overflow = 'hidden';
-                        // Tạo id duy nhất cho modal và button
-                        const modalId = `modal-post-actions-${post.id}`;
-                        const modalPanelId = `modal-post-actions-panel-${post.id}`;
-                        const btnId = `post-actions-btn-${post.id}`;
-                        // Header bài viết chỉ còn title và nút actions
+                        postDiv.className =
+                            'bg-white rounded-lg shadow p-4 flex flex-row gap-4 items-center mb-4 hover:shadow-lg transition min-h-[120px]';
                         postDiv.innerHTML = `
-                        <div class="flex flex-row items-center mb-2 justify-between">
-                            <div class="flex items-center gap-3">
-                                <img src="${coverImg}" alt="cover" class="w-22 h-22 object-cover rounded-md border border-gray-200 bg-gray-100" style="aspect-ratio:1/1;">
-                                <a href="/post-content-viewer/${post.id}" class="font-bold text-base text-gray-800 cursor-pointer post-title-hover">${post.title || 'lỗi gì đó'}</a>
-                            </div>
-                            <div class="relative cursor-pointer">
-                                <button id="${btnId}" class="p-2 rounded-full hover:bg-gray-200 focus:outline-none cursor-pointer" title="Actions" type="button">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-500 cursor-pointer">
-                                        <path cursor-pointer stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0 7.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm0 7.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" />
-                                    </svg>
-                                </button>
-                                <div id="dropdown-${post.id}" class="hidden absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-50 cursor-pointer z-index-99">
-                                    <button type="button" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-gray-800 change-status-btn cursor-pointer" data-post-id="${post.id}" data-current-status="${post.status}">
-                                        Set status: ${post.status === 'public' ? 'Private' : 'Public'}
-                                    </button>
-                                    <button type="button" class="w-full text-left px-4 py-2 text-sm hover:bg-red-100 text-red-600 delete-post-btn cursor-pointer" data-post-id="${post.id}">
-                                        Delete post
-                                    </button>
+                            <img src="${coverImg}" alt="Post Image" class="w-20 h-20 object-cover rounded-md bg-gray-100" onerror="this.src='/images/free-images-for-blog.png'">
+                            <div class="flex-1 min-w-0">
+                                <a href="/post-content-viewer/${post.id}" class="font-bold text-base text-black cursor-pointer post-title-hover hover:text-blue-600 hover:underline-0" style="text-decoration: none;">${post.title || 'lỗi gì đó'}</a>
+                                <div class="text-gray-600 text-sm mt-1">${post.preview || ''}</div>
+                                <div class="flex flex-row items-center gap-2 mt-2">
+                                    <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold cursor-pointer">${categoryName}</span>
+                                    <span class="px-2 py-1 rounded text-xs ${post.status === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'} cursor-pointer">${status}</span>
+                                    <span class="text-xs text-gray-400 ml-auto">${createdAt}</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="flex flex-row items-center justify-between mb-2 w-full">
-                            <div class="flex flex-row items-center gap-2">
-                                <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold cursor-pointer">${categoryName}</span>
-                                <span class="px-2 py-1 rounded text-xs ${post.status === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'} cursor-pointer">${status}</span>
-                            </div>
-                            <div class="text-xs text-gray-400 cursor-pointer">${createdAt}</div>
-                        </div>
                         `;
                         postsList.appendChild(postDiv);
-                        // Sự kiện mở dropdown cho từng post
-                        setTimeout(() => {
-                            const btn = document.getElementById(btnId);
-                            const dropdown = document.getElementById(`dropdown-${post.id}`);
-                            if (btn && dropdown) {
-                                btn.addEventListener('click', function(e) {
-                                    e.preventDefault();
-                                    // Đóng tất cả dropdown khác
-                                    document.querySelectorAll('[id^="dropdown-"]')
-                                        .forEach(el => {
-                                            if (el !== dropdown) el.classList.add(
-                                                'hidden');
-                                        });
-                                    dropdown.classList.toggle('hidden');
-                                });
-                                // Đóng dropdown khi click ra ngoài
-                                document.addEventListener('mousedown', function handler(event) {
-                                    if (!btn.contains(event.target) && !dropdown
-                                        .contains(event.target)) {
-                                        dropdown.classList.add('hidden');
-                                    }
-                                });
-                            }
-                            // Sự kiện đổi status
-                            const statusBtn = dropdown.querySelector('.change-status-btn');
-                            if (statusBtn) {
-                                statusBtn.addEventListener('click', function() {
-                                    const postId = this.getAttribute('data-post-id');
-                                    if (!postId) return;
-                                    fetch(`/update-status/${postId}`, {
-                                        method: 'PATCH',
-                                        headers: {
-                                            'X-Requested-With': 'XMLHttpRequest',
-                                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                                            'Accept': 'application/json'
-                                        }
-                                    })
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: 'Updated!',
-                                                text: data.message || 'Status updated.',
-                                                showConfirmButton: false,
-                                                timer: 1000
-                                            }).then(() => {
-                                                location.reload();
-                                            });
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Error!',
-                                                text: data.message || 'Update failed!'
-                                            });
-                                        }
-                                    })
-                                    .catch(() => {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Error!',
-                                            text: 'Update failed!'
-                                        });
-                                    });
-                                    dropdown.classList.add('hidden');
-                                });
-                            }
-                            // Sự kiện xóa post
-                            const deleteBtn = dropdown.querySelector('.delete-post-btn');
-                            if (deleteBtn) {
-                                deleteBtn.addEventListener('click', function() {
-                                    // Gửi SweetAlert xác nhận xóa
-                                    const postId = this.getAttribute('data-post-id');
-                                    if (!postId) return;
-                                    Swal.fire({
-                                        title: 'Are you sure?',
-                                        text: 'This action cannot be undone!',
-                                        icon: 'warning',
-                                        showCancelButton: true,
-                                        confirmButtonColor: '#d33',
-                                        cancelButtonColor: '#3085d6',
-                                        confirmButtonText: 'Yes, delete it!'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            fetch(`/delete-post/${postId}`, {
-                                                    method: 'DELETE',
-                                                    headers: {
-                                                        'X-Requested-With': 'XMLHttpRequest',
-                                                        'X-CSRF-TOKEN': document
-                                                            .querySelector(
-                                                                'meta[name="csrf-token"]'
-                                                                )
-                                                            .getAttribute(
-                                                                'content'),
-                                                        'Accept': 'application/json'
-                                                    }
-                                                })
-                                                .then(res => res.json())
-                                                .then(data => {
-                                                    if (data.success) {
-                                                        Swal.fire({
-                                                            icon: 'success',
-                                                            title: 'Deleted!',
-                                                            text: data.message || 'Post has been deleted.',
-                                                            showConfirmButton: false,
-                                                            timer: 1000
-                                                        }).then(() => {
-                                                            location.reload();
-                                                        });
-                                                    } else {
-                                                        Swal.fire({
-                                                            icon: 'error',
-                                                            title: 'Error!',
-                                                            text: data
-                                                                .message ||
-                                                                'Delete failed!'
-                                                        });
-                                                    }
-                                                })
-                                                .catch(() => {
-                                                    Swal.fire({
-                                                        icon: 'error',
-                                                        title: 'Error!',
-                                                        text: 'Delete failed!'
-                                                    });
-                                                });
-                                        }
-                                    });
-                                    dropdown.classList.add('hidden');
-                                });
-                            }
-                        }, 0);
                     });
                 });
 

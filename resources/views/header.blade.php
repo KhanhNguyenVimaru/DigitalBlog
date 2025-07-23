@@ -30,28 +30,31 @@
                 <input id="search-input" type="text" placeholder="Search..."
                     class="w-1/2 min-w-[200px] max-w-xl px-4 py-2 border border-gray-300 rounded-full shadow focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm bg-white" />
             </div>
-            <a id="login-link" style="display:none" href="/page_login"
-                class="text-sm font-semibold text-gray-600 hover:text-black">Log in<span
-                    aria-hidden="true">&rarr;</span></a>
-            <div id="account-dropdown-wrapper" class="relative" style="display:none;">
-                <button id="account-link" type="button"
-                    class="flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-black focus:outline-none cursor-pointer">
-                    <span>{{ $user->name }}</span>
-                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
-                <div id="account-dropdown"
-                    class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50">
-                    <a href="/my-profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">My Profile</a>
-                    <a href="/page_account" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Setting</a>
-                    @if ($role === 'admin')
-                        <a href="/admin" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Admin</a>
-                    @endif
-                    <button id="logout-btn" type="button"
-                        class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 text-red-600 cursor-pointer">Logout</button>
+            @if(!$user)
+                <a id="login-link" href="/page_login"
+                    class="text-sm font-semibold text-gray-600 hover:text-black">Log in<span
+                        aria-hidden="true">&rarr;</span></a>
+            @else
+                <div id="account-dropdown-wrapper" class="relative">
+                    <button id="account-link" type="button"
+                        class="flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-black focus:outline-none cursor-pointer">
+                        <span>{{ $user->name }}</span>
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="account-dropdown"
+                        class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50">
+                        <a href="/my-profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">My Profile</a>
+                        <a href="/page_account" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Setting</a>
+                        @if ($role === 'admin')
+                            <a href="/admin" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Admin</a>
+                        @endif
+                        <button id="logout-btn" type="button"
+                            class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 text-red-600 cursor-pointer">Logout</button>
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
     </nav>
 </header>

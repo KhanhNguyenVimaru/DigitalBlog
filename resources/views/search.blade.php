@@ -10,9 +10,11 @@
 </head>
 @php use Illuminate\Support\Str; @endphp
 @include('header')
-
-<div class="container mx-auto py-8 flex justify-center bg-gray-100" style="min-height:90vh">
-    <div class="w-3/5 bg-white rounded-lg p-8 shadow-md" style="width:60%">
+@include('components.breadcrumb', [
+    'links' => \App\Http\Controllers\Controller::generateBreadcrumbLinks()
+])
+<div class="container mx-auto flex justify-center bg-gray-100" style="min-height:90vh">
+    <div class="w-3/5 bg-white rounded-lg p-8 shadow-md my-4" style="width:60%">
         <h5 class="text-lg font-bold mb-4 text-center">Search results for: "{{ $query }}"</h5>
 
         <div class="flex justify-center gap-2 mb-8 w-full max-w-md mx-auto">

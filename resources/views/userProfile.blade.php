@@ -50,16 +50,12 @@
 
 <body class="bg-gray-100 min-h-screen">
     @include('header')
-    {{-- @if (request('private_profile'))
-        <div class="max-w-2xl mx-auto mt-8">
-            <div class="w-full bg-white border border-gray-200 text-gray-700 p-8 rounded-lg shadow text-center text-lg font-semibold">
-                This account is <span class="font-bold">private</span>.<br>You need to follow to see this user's posts.
-            </div>
-        </div>
-    @endif --}}
-    <div class="flex flex-row justify-center w-full relative gap-6">
+    @include('components.breadcrumb', [
+        'links' => \App\Http\Controllers\Controller::generateBreadcrumbLinks()
+    ])
+    <div class="flex flex-row justify-center w-full relative gap-6 mt-0 pt-0">
         <!-- Account Info (bên trái) -->
-        <div class="max-w-xs w-full mt-8 p-8 bg-white rounded-lg shadow-md flex flex-col items-center gap-8 mx-10 mr-4">
+        <div class="max-w-xs w-full mt-2 p-8 bg-white rounded-lg shadow-md flex flex-col items-center gap-8 mx-10 mr-4">
             <!-- Avatar -->
             <div class="flex flex-col items-center w-full">
                 <img src="{{ $user->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}"
@@ -104,7 +100,7 @@
         @endif
 
         <!-- Main content (bên phải) -->
-        <div class="flex-1 flex flex-col gap-6 mt-8 mx-10 ml-0">
+        <div class="flex-1 flex flex-col gap-6 mt-2 mx-10 ml-0">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="posts-row-all"></div>
         </div>
     </div>

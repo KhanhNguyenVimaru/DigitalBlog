@@ -36,7 +36,10 @@
 
 <body class="bg-gray-100 min-h-screen">
     @include('header')
-    <div class="min-h-screen bg-gray-100 flex flex-col items-center py-4">
+    @include('components.breadcrumb', [
+        'links' => \App\Http\Controllers\Controller::generateBreadcrumbLinks()
+    ])
+    <div class="min-h-screen bg-gray-100 flex flex-col items-center py-0 mt-0 pt-0">
         <div class="w-full max-w-4xl bg-white rounded-lg shadow-md p-8">
             <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Create New Post</h2>
             <div class="a4-wrapper">

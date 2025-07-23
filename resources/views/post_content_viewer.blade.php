@@ -50,9 +50,12 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
     @include('header')
-    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8 mt-5">
+    @include('components.breadcrumb', [
+        'links' => \App\Http\Controllers\Controller::generateBreadcrumbLinks()
+    ])
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8 mt-0 pt-0">
         @if($category)
-            <a href="#"class="text-xs text-blue-600 hover:underline font-semibold mb-4 inline-block uppercase tracking-wide">{{ $category }}</a>
+            <a href="#"class="text-xs text-blue-600 hover:underline font-semibold mb-4 inline-block uppercase tracking-wide my-4">{{ $category }}</a>
         @endif
         <h1 class="text-4xl font-bold mb-4 text-gray-900 text-center leading-tight">{{ $title }}</h1>
         <div class="flex items-center justify-start gap-3 mb-8">
