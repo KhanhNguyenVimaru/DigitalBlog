@@ -311,7 +311,7 @@
                                 <a href="/post-content-viewer/${post.id}" class="font-bold text-base text-black cursor-pointer post-title-hover hover:text-blue-600 hover:underline-0" style="text-decoration: none;">${post.title || 'lỗi gì đó'}</a>
                                 <div class="text-gray-600 text-sm mt-1">${post.preview || ''}</div>
                                 <div class="flex flex-row items-center gap-2 mt-2">
-                                    <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold cursor-pointer">${categoryName}</span>
+                                    <span class="inline-block truncate px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold cursor-pointer">${categoryName}</span>
                                     <span class="px-2 py-1 rounded text-xs ${post.status === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'} cursor-pointer">${status}</span>
                                     <span class="text-xs text-gray-400 ml-auto">${createdAt}</span>
                                 </div>
