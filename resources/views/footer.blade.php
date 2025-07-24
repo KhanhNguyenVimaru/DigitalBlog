@@ -1,4 +1,4 @@
-<footer class="bg-white border-t border-gray-200 mt-12">
+<footer class="bg-white border-t border-gray-200 mt-auto">
     <div class="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-2 mb-2 md:mb-0">
             <span class="text-lg font-bold" style="color: #2832c2">DIGITAL BLOG</span>

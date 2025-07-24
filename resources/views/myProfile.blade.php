@@ -54,6 +54,7 @@
 
 <body class="bg-gray-100 min-h-screen">
     @include('header')
+    <div style="min-height: 80vh;">
     @include('components.breadcrumb', [
         'links' => \App\Http\Controllers\Controller::generateBreadcrumbLinks(),
     ])
@@ -210,6 +211,7 @@
         <div class="spinner"
             style="border: 6px solid #f3f3f3; border-top: 6px solid #2563eb; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;">
         </div>
+    </div>
     </div>
     <style>
         @keyframes spin {

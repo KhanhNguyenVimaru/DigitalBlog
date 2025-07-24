@@ -24,8 +24,7 @@ class NotifyController extends Controller
     public function loadUserNotify()
     {
         $notifies = Notify::where('send_to_id', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->orderBy('created_at', 'desc')->limit(6)->get();
         return response()->json($notifies);
     }
 }

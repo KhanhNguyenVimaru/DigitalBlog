@@ -148,12 +148,14 @@
         // Notification bell logic
         const bell = document.getElementById('notification-bell');
         const dropdown = document.getElementById('notification-dropdown');
+
         if (bell && dropdown) {
             bell.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                // Fetch notify mỗi lần click chuông
-                fetch('/loadUserNotify', {
+
+                if (dropdown.classList.contains('hidden')) {
+                    fetch('/loadUserNotify', {
                         method: 'GET',
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
@@ -166,7 +168,7 @@
                             '<div class="font-semibold text-gray-700 mb-2">Notifications</div>';
                         if (!notifies.length) {
                             html +=
-                            '<div class="text-gray-500 text-sm">No notifications yet.</div>';
+                                '<div class="text-gray-500 text-sm">No notifications yet.</div>';
                         } else {
                             html += notifies.map(n => {
                                 let userSentId = n.send_from_id;
@@ -184,15 +186,16 @@
                             }).join('');
                         }
                         dropdown.innerHTML = html;
-                        dropdown.classList.toggle('hidden');
                     });
+                }
+                dropdown.classList.toggle('hidden');
             });
+
             document.addEventListener('click', function(e) {
                 if (!dropdown.contains(e.target) && !bell.contains(e.target)) {
                     dropdown.classList.add('hidden');
                 }
             });
-
         }
     });
 </script>
