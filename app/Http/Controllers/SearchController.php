@@ -13,6 +13,10 @@ class SearchController extends Controller
     {
         $query = $request->input('query');
         $posts = post::where('title', 'like', "%$query%")
+            ->where('status', 'public')
+            ->whereHas('author', function ($q) {
+                $q->where('privacy', 'public');
+            })
             ->get();
         $users = User::where('name', 'like', "%$query%")
             ->orWhere('email', 'like', "%$query%")
@@ -22,4 +26,4 @@ class SearchController extends Controller
 
         return view('search', compact('query', 'posts', 'users', 'categories'));
     }
-} 
+}

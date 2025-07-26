@@ -1,6 +1,6 @@
 @php
     $json = is_string($content) ? $content : json_encode($content);
-    
+
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -53,9 +53,11 @@
     @include('components.breadcrumb', [
         'links' => \App\Http\Controllers\Controller::generateBreadcrumbLinks()
     ])
-    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8 mt-0 pt-0">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8 mt-0 pt-0 mb-10">
         @if($category)
             <a href="#"class="text-xs text-blue-600 hover:underline font-semibold mb-4 inline-block uppercase tracking-wide my-4">{{ $category }}</a>
+        @else
+                <a href="#"class="text-xs text-blue-600 hover:underline font-semibold mb-4 inline-block uppercase tracking-wide my-4">NO CATEGORY</a>
         @endif
         <h1 class="text-4xl font-bold mb-4 text-gray-900 text-center leading-tight">{{ $title }}</h1>
         <div class="flex items-center justify-start gap-3 mb-8">
@@ -124,4 +126,4 @@
     </script>
     @include('footer')
 </body>
-</html> 
+</html>

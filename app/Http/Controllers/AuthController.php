@@ -61,7 +61,7 @@ class AuthController extends Controller
                 'access_token' => $token,
                 'token_type' => 'Bearer',
                 'user' => $user->name,
-            ], 200); 
+            ], 200);
         };
         return response()->json(['error' => 'Unauthorized'], 401);
     }

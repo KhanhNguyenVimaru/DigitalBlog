@@ -15,4 +15,4 @@
             Please check your email and click the verification link to activate your account.</p>
     </div>
 </body>
-</html> 
+</html>

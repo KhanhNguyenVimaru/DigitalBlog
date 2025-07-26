@@ -32,7 +32,7 @@ Route::delete('/delete_account', [UserController::class, 'deleteUserAccount'])->
 Route::middleware('auth:api')->post('/change_password', [UserController::class, 'changePassword'])->name('changePassword');
 Route::post('/update-avatar', [UserController::class, 'updateAvatar'])->middleware('auth');
 // API POST
-Route::post('/insert-post', [PostController::class, 'storeContent'])->name('insertPost')->middleware('auth'); 
+Route::post('/insert-post', [PostController::class, 'storeContent'])->name('insertPost')->middleware('auth');
 Route::post('/uploadFile', [PostController::class, 'uploadFile'])->name('uploadFile')->middleware('auth');
 Route::get('/content-of-users', [PostController::class, 'contentOfUsers'])->name('contentOfUsers')->middleware('auth'); //  content of users ám chỉ bài viết của người dùng đăng nhập
 Route::delete('/delete-post/{id}', [PostController::class, 'deletePost'])->name('deletePost')->middleware('auth');
@@ -47,7 +47,7 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::get('/follow_user/{id}',[FollowUserController::class, 'followUser'])->name('followUser')->middleware('auth');
 Route::delete('/delete_follow/{id}', [FollowUserController::class, 'deleteFollow'])->name('deleteFollow')->middleware('auth');
 Route::delete('/revoke_follow_request/{id}', [FollowUserController::class, 'revokeFollowRequest'])->name('revokeFollowRequest');
-Route::get('/my-followers', [UserController::class, 'getFollowers'])->middleware('auth'); // trả về số người follow 
+Route::get('/my-followers', [UserController::class, 'getFollowers'])->middleware('auth'); // trả về số người follow
 Route::get('/my-following', [UserController::class, 'getFollowing'])->middleware('auth'); // trả về số người mình đang follow
 Route::delete('/deny-request',[FollowUserController::class, 'denyRequest'])->middleware('auth');
 Route::post('/accept-request',[FollowUserController::class, 'acceptRequest'])->middleware('auth');
