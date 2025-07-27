@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerifySignUpMail;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class AuthController extends Controller
 {
@@ -48,13 +50,17 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required'
         ]);
-        if (Auth::attempt([
-            'email' => $request->email,
-            'password' => $request->password
-        ])) {
+        $user = User::withTrashed()->where('email', $request->email)->first();
+        if(!$user){
+            return response()->json(['error' => 'Your account does not exist']);
+        }else if($user->trashed()){
+            $user->restore();
+        }
+
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
             if (is_null($user->email_verified_at)) {
-                return response()->json(['error' => 'Please verify your email before logging in.'], 403);
+                return response()->json(['error' => 'Please verify your email before logging in.']);
             }
             $token = $user->createToken('myApp')->accessToken;
             return response()->json([

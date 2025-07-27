@@ -254,11 +254,10 @@
             if (deleteAccountForm) {
                 deleteAccountForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-
                     // Show confirmation dialog
                     Swal.fire({
                         title: 'Are you sure?',
-                        text: "This action cannot be undone. Your account and all associated data will be permanently deleted.",
+                        text: "Your account is scheduled to be deleted in 30 days. If you log in during this period, the deletion process will be canceled.",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#d33',

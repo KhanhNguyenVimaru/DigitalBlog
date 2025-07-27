@@ -10,6 +10,8 @@ use App\Http\Controllers\FollowUserController;
 use App\Http\Controllers\NotifyController;
 use App\Models\followUser;
 use App\Http\Controllers\SearchController;
+use App\Console\Commands\DeleteExpiredAccount;
+use Illuminate\Support\Facades\Schedule;
 
 // PAGE UI
 Route::get('/', function () {return view('index');})->middleware('auth');
@@ -31,6 +33,7 @@ Route::patch('/update_user/{id}', [UserController::class, 'updateUserData'])->na
 Route::delete('/delete_account', [UserController::class, 'deleteUserAccount'])->name('deleteUserAccount')->middleware('auth');
 Route::middleware('auth:api')->post('/change_password', [UserController::class, 'changePassword'])->name('changePassword');
 Route::post('/update-avatar', [UserController::class, 'updateAvatar'])->middleware('auth');
+Schedule::command(DeleteExpiredAccount::class)->daily();
 // API POST
 Route::post('/insert-post', [PostController::class, 'storeContent'])->name('insertPost')->middleware('auth');
 Route::post('/uploadFile', [PostController::class, 'uploadFile'])->name('uploadFile')->middleware('auth');
