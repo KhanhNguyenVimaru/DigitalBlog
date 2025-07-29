@@ -11,9 +11,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
     @include('header')
-    @include('components.breadcrumb', [
-        'links' => \App\Http\Controllers\Controller::generateBreadcrumbLinks()
-    ])
+
     <div class="flex justify-center items-start min-h-[calc(100vh-64px)] p-0 mt-0 pt-0">
         <div class="bg-white w-1/2 rounded-2xl shadow-2xl border border-gray-200 p-8 mt-4 mb-10">
             <div class="space-y-6">
