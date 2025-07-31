@@ -10,6 +10,7 @@ use App\Models\long_content;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Models\comment;
 
 class PostController extends Controller
 {
@@ -195,6 +196,13 @@ class PostController extends Controller
     public function viewContentJson($id)
     {
         $post = post::with('category', 'author')->findOrFail($id);
+        
+        // Lấy comments của post này, sắp xếp theo thời gian mới nhất
+        $comments = \App\Models\Comment::with('user')
+            ->where('post_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
         return view('post_content_viewer', [
             'content' => $post->content,
             'title' => $post->title,
@@ -203,6 +211,8 @@ class PostController extends Controller
             'author_avatar' => $post->author && $post->author->avatar ? $post->author->avatar : 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg',
             'author_name' => $post->author ? $post->author->name : 'Unknown',
             'created_at' => $post->created_at->format('Y-m-d') ? $post->created_at->format('Y-m-d') : 'Unknown',
+            'comments' => $comments, // Thêm comments vào view
+            'post_id' => $id, // Thêm post_id để sử dụng trong form comment
         ]);
     }
     public function index()

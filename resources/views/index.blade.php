@@ -22,11 +22,12 @@
                     class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="...">
             </div>
             <!-- Item 2 -->
-            <div class="transition-all duration-1000 ease-in-out" data-carousel-item="active">
+            <div class="hidden transition-all duration-1000 ease-in-out" data-carousel-item="active">
                 <img src="{{ asset('images/carousel_img/image_2.png') }}"
                     class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="...">
             </div>
         </div>
+
         <!-- Slider controls -->
         <button type="button"
             class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
@@ -49,9 +50,14 @@
             <span class="sr-only">Next</span>
         </button>
     </div>
-    <div class = "w-full">
-        
+
+    <!-- Post Section -->
+    <div class="w-full mt-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="top-posts">
+            <!-- Các bài viết -->
+        </div>
     </div>
+
     @include('footer')
 
     <!-- Flowbite JS -->

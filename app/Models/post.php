@@ -30,4 +30,10 @@ class post extends Model
     {
         return $this->belongsTo(User::class, 'authorId');
     }
+    public function comment(){
+        return $this->hasMany(\App\Models\comment::class, 'post_id');
+    }
+    public function like(){
+        return $this->hasMany(\App\Models\comment::class, 'post_id');
+    }
 }

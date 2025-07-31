@@ -55,4 +55,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function comment(){
+        return $this->hasMany(\App\Models\comment::class, 'post_id');
+    }
+    public function like(){
+        return $this->hasMany(\App\Models\comment::class, 'post_id');
+    }
 }

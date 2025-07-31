@@ -12,6 +12,7 @@ use App\Models\followUser;
 use App\Http\Controllers\SearchController;
 use App\Console\Commands\DeleteExpiredAccount;
 use Illuminate\Support\Facades\Schedule;
+use App\Http\Controllers\CommentController;
 
 // PAGE UI
 Route::get('/', function () {return view('index');})->middleware('auth');
@@ -46,6 +47,11 @@ Route::get('/search-suggest', [UserController::class, 'searchSuggest'])->name('s
 Route::get('/content-of-author/{id}', [PostController::class, 'contentOfAuthor'])->name('contentOfAuthor'); //  content of author là bài viết của người dùng khác
 Route::match(['get', 'post'], '/fetchUrl',[PostController::class, 'loadLink'])->name('fetchUrl')->middleware('auth');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+// COMMENT ROUTES
+Route::post('/comments', [CommentController::class, 'store'])->name('comments.store')->middleware('auth');
+Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy')->middleware('auth');
+
 // FOLLOW/UNFOLLOW USER
 Route::get('/follow_user/{id}',[FollowUserController::class, 'followUser'])->name('followUser')->middleware('auth');
 Route::delete('/delete_follow/{id}', [FollowUserController::class, 'deleteFollow'])->name('deleteFollow')->middleware('auth');
