@@ -52,12 +52,26 @@
     </div>
 
     <!-- Post Section -->
-    <div class="w-full mt-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="top-posts">
-            <!-- Các bài viết -->
+    <div class="w-full h-[50vh] mt-4 ">
+        <div class = "w-100% my-9 flex flex-row">
+            <h4 class = "ml-20 font-bold">TOP BEST</h4>
+            <a href="" class="text-gray-500 ml-10">Top Highlighted Posts</a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 px-18" id="top-posts">
+            <div class="bg-white p-3 rounded shadow">
+                Bài viết 1
+            </div>
+            <div class="bg-white p-3 rounded shadow">
+                Bài viết 1
+            </div>
+            <div class="bg-white p-3 rounded shadow">
+                Bài viết 1
+            </div>
+            <div class="bg-white p-3 rounded shadow">
+                Bài viết 1
+            </div>
         </div>
     </div>
-
     @include('footer')
 
     <!-- Flowbite JS -->

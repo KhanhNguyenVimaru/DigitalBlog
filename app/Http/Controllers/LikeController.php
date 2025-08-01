@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 class LikeController extends Controller
 {
     public function countLike($id){
+        DB::beginTransaction();
         try {
             $likeCount = like::where('post_id', $id)->where('like', true)->count();
             $dislikeCount = like::where('post_id', $id)->where('like', false)->count();
@@ -32,6 +33,7 @@ class LikeController extends Controller
 
     public function like(Request $request){
         DB::beginTransaction();
+        $status = null;
         try{
             $post_id = $request->post_id;
             $user_id = Auth::id();
@@ -42,9 +44,11 @@ class LikeController extends Controller
             if($existingDisLike){
                 $existingDisLike->like = true;
                 $existingDisLike->save();
-            } 
+                $status = true;
+            }
             else if($existingLike){
                 $existingLike->delete();
+                $status = false;
             }
             else {
                 $newlike = new like();
@@ -52,10 +56,11 @@ class LikeController extends Controller
                 $newlike->user_id = $user_id;
                 $newlike->like = true;
                 $newlike->save();
+                $status = "true";
             }
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Liked successfully']);
+            return response()->json(['success' => true, 'message' => 'Liked successfully', 'status' => $status]);
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Like Post Failed: '.$e->getMessage());
@@ -64,6 +69,7 @@ class LikeController extends Controller
     }
 
     public function dislike(Request $request){
+        $status = null;
         DB::beginTransaction();
         try{
             $post_id = $request->post_id;
@@ -75,9 +81,11 @@ class LikeController extends Controller
             if($existingLike){
                 $existingLike->like = false;
                 $existingLike->save();
+                $status = true;
             }
             else if($existingDisLike){
                 $existingDisLike->delete();
+                $status = false;
             }
             else {
                 $newlike = new like();
@@ -85,15 +93,16 @@ class LikeController extends Controller
                 $newlike->user_id = $user_id;
                 $newlike->like = false;
                 $newlike->save();
+                $status = true;
             }
 
             DB::commit();
 
-            return response()->json(['success' => true, 'message' => 'Disliked successfully']);
+            return response()->json(['success' => true, 'message' => 'Disliked successfully','status' => $status]);
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Dislike Post Failed: '.$e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Dislike Post Fail']);
+            return response()->json(['success' => false, 'message' => 'Dislike Post Fail','status' => $status]);
         }
     }
 

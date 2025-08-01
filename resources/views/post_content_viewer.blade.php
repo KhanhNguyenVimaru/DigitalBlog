@@ -164,7 +164,8 @@
                                     <!-- Header: Name, Time, Actions -->
                                     <div class="flex items-center justify-between mb-2">
                                         <div class="flex items-center space-x-2">
-                                            <h4 class="text-sm font-semibold text-gray-900 truncate">
+                                            <h4 href="{{ route('userProfile', $comment->user->id) }}"
+                                                class="text-sm font-semibold text-gray-900 truncate">
                                                 {{ $comment->user->name }}
                                             </h4>
                                             <span class="text-xs text-gray-500">
@@ -210,6 +211,28 @@
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            const likeBtn = document.getElementById('like-btn');
+            const dislikeBtn = document.getElementById('dislike-btn');
+
+            document.addEventListener("DOMContentLoaded", function() {
+
+                const checkLiked = @json($checkliked);
+                const checkDisliked = @json($checkdisliked);
+
+                if (checkLiked) {
+                    likeBtn.classList.add('bg-blue-100', 'border-blue-400', 'text-blue-700');
+                    dislikeBtn.classList.add('bg-white', 'border-gray-300', 'text-gray-300');
+                } else if (checkDisliked) {
+                    dislikeBtn.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+                    likeBtn.classList.add('bg-white', 'border-gray-300', 'text-gray-300');
+                } else {
+                    dislikeBtn.classList.add('bg-white', 'border-gray-300', 'text-gray-300');
+                    likeBtn.classList.add('bg-white', 'border-gray-300', 'text-gray-300');
+                }
+            });
+        </script>
+
         <script>
             function renderPostContent(holderId, contentData) {
                 if (!contentData || !contentData.blocks) return;
@@ -407,10 +430,18 @@
                         if (data.success) {
                             showNotification('Post liked successfully!', 'success');
                             updateLikeCounts(postId);
+                            if (data.status) {
+                                likeBtn.classList.remove('bg-white', 'border-gray-300', 'text-gray-300');
+                                likeBtn.classList.add('bg-blue-100', 'border-blue-400', 'text-blue-700');
 
-                            // Update button states
-                            likeBtn.classList.add('bg-blue-100', 'border-blue-400', 'text-blue-700');
-                            dislikeBtn.classList.remove('bg-red-100', 'border-red-400', 'text-red-700');
+                                dislikeBtn.classList.remove('bg-blue-100', 'border-blue-400', 'text-blue-700');
+                                dislikeBtn.classList.add('bg-white', 'border-gray-300', 'text-gray-300');
+
+                            } else {
+                                dislikeBtn.classList.add('bg-white', 'border-gray-300');
+                                likeBtn.classList.add('bg-white', 'border-gray-300');
+                            }
+
                         } else {
                             showNotification(data.message || 'Failed to like post', 'error');
                         }
@@ -456,10 +487,19 @@
                         if (data.success) {
                             showNotification('Post disliked successfully!', 'success');
                             updateLikeCounts(postId);
+                            if (data.status) {
+                                // Khi user chọn dislike:
+                                dislikeBtn.classList.remove('bg-white', 'border-gray-300', 'text-gray-300');
+                                dislikeBtn.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
 
-                            // Update button states
-                            dislikeBtn.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
-                            likeBtn.classList.remove('bg-blue-100', 'border-blue-400', 'text-blue-700');
+                                likeBtn.classList.remove('bg-blue-100', 'border-blue-400', 'text-blue-700');
+                                likeBtn.classList.add('bg-white', 'border-gray-300', 'text-gray-300');
+
+                            } else {
+                                dislikeBtn.classList.add('bg-white', 'border-gray-300');
+                                dislikeBtn.classList.remove('bg-red-100', 'border-red-400');
+                                likeBtn.classList.add('bg-white', 'border-gray-300');
+                            }
                         } else {
                             showNotification(data.message || 'Failed to dislike post', 'error');
                         }

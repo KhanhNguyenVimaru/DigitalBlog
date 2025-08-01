@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Schedule;
 use App\Http\Controllers\CommentController;
 
 // PAGE UI
-Route::get('/', function () {return view('index');})->middleware('auth');
+Route::get('/',[PostController::class, 'topBestPost'])->name('topBestPost');
 Route::get('/page_login', function () {return view('login');})->name('login');
 Route::get('/page_signup', function () {return view('signup');})->name('signup');
 Route::get('/page_account', function () {return view('account');})->name('account')->middleware('auth');
@@ -47,16 +47,13 @@ Route::get('/search-suggest', [UserController::class, 'searchSuggest'])->name('s
 Route::get('/content-of-author/{id}', [PostController::class, 'contentOfAuthor'])->name('contentOfAuthor'); //  content of author là bài viết của người dùng khác
 Route::match(['get', 'post'], '/fetchUrl',[PostController::class, 'loadLink'])->name('fetchUrl')->middleware('auth');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
-
 // COMMENT ROUTES
 Route::post('/comments', [CommentController::class, 'store'])->name('comments.store')->middleware('auth');
 Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy')->middleware('auth');
-
 // LIKE/DISLIKE ROUTES
 Route::post('/like', [App\Http\Controllers\LikeController::class, 'like'])->name('like')->middleware('auth');
 Route::post('/dislike', [App\Http\Controllers\LikeController::class, 'dislike'])->name('dislike')->middleware('auth');
 Route::get('/count-like/{id}', [App\Http\Controllers\LikeController::class, 'countLike'])->name('countLike');
-
 // FOLLOW/UNFOLLOW USER
 Route::get('/follow_user/{id}',[FollowUserController::class, 'followUser'])->name('followUser')->middleware('auth');
 Route::delete('/delete_follow/{id}', [FollowUserController::class, 'deleteFollow'])->name('deleteFollow')->middleware('auth');

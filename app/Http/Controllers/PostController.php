@@ -9,12 +9,28 @@ use Illuminate\Http\Request;
 use App\Models\long_content;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Models\comment;
 use App\Models\like;
+use Carbon\Carbon;
 
 class PostController extends Controller
 {
+    public function topBestPost()
+    {
+        $topLikedPosts = post::withCount('likes')
+            ->whereBetween('created_at', [
+                Carbon::now()->subDays(7)->startOfDay(),
+                Carbon::now()->endOfDay()
+            ])
+            ->orderBy('likes_count', 'desc')
+            ->limit(4)
+            ->get();
+
+        return view('index', compact('topLikedPosts'));
+    }
+
     public function loadLink($request)
     {
         $url = $request->input('url') ?? $request->query('url');
@@ -212,6 +228,16 @@ class PostController extends Controller
             ->where('like', false)
             ->count();
 
+        $checkliked = like::where('post_id', $id)
+            ->where('user_id', Auth::id())
+            ->where('like', true)
+            ->exists();
+        $checkdisliked = like::where('post_id', $id)
+            ->where('user_id', Auth::id())
+            ->where('like', false)
+            ->exists();
+
+
         return view('post_content_viewer', [
             'content' => $post->content,
             'title' => $post->title,
@@ -223,7 +249,9 @@ class PostController extends Controller
             'comments' => $comments, // Thêm comments vào view
             'post_id' => $id, // Thêm post_id để sử dụng trong form comment
             'countlike' => $countlike,
-            'countdislike' => $countdislike
+            'countdislike' => $countdislike,
+            'checkliked' => $checkliked,
+            'checkdisliked' => $checkdisliked
         ]);
     }
 }
