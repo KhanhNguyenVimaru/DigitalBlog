@@ -2,7 +2,7 @@
         $json = is_string($content) ? $content : json_encode($content);
 
     @endphp
-    <!DOCTYPE html>
+    <!DOCTYPE html> 
     <html lang="en">
 
     <head>
@@ -83,7 +83,6 @@
             <div class="editorjs-content text-gray-800" id="editorjs-render">
             </div>
             <hr class="w-[100%] h-[0.5px] bg-gray-400 border-0">
-
             <!-- Like/Dislike Section -->
             <div class="flex items-center justify-end space-x-6 mt-8 mb-6">
                 <div class="flex items-center space-x-2">
@@ -97,7 +96,6 @@
                         <span id="like-count" class="text-gray-700 font-medium">{{ $countlike }}</span>
                     </button>
                 </div>
-
                 <div class="flex items-center space-x-2">
                     <button id="dislike-btn" onclick="dislikePost({{ $post_id }})"
                         class="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-red-50 hover:border-red-300 transition-colors">
@@ -109,9 +107,6 @@
                         <span id="dislike-count" class="text-gray-700 font-medium">{{ $countdislike }}</span>
                     </button>
                 </div>
-            </div>
-            <div>
-
             </div>
         </div>
 
@@ -164,8 +159,8 @@
                                     <!-- Header: Name, Time, Actions -->
                                     <div class="flex items-center justify-between mb-2">
                                         <div class="flex items-center space-x-2">
-                                            <h4 href="{{ route('userProfile', $comment->user->id) }}"
-                                                class="text-sm font-semibold text-gray-900 truncate">
+                                            <h4 data-href="{{ route('userProfile', $comment->user->id) }}"
+                                                class="text-sm font-semibold text-gray-900 truncate cursor-pointer">
                                                 {{ $comment->user->name }}
                                             </h4>
                                             <span class="text-xs text-gray-500">
@@ -542,6 +537,21 @@
                 updateLikeCounts({{ $post_id }});
             });
         </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const userHeadings = document.querySelectorAll('h4[data-href]');
+
+                userHeadings.forEach(h4 => {
+                    h4.addEventListener('click', function() {
+                        const url = h4.getAttribute('data-href');
+                        if (url) {
+                            window.location.href = url;
+                        }
+                    });
+                });
+            });
+        </script>
+
         @include('footer')
     </body>
 

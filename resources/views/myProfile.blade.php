@@ -403,7 +403,18 @@
         }
 
         async function deletePost(postId) {
-            if (confirm('Are you sure you want to delete this post?')) {
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'This post will be permanently deleted!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it',
+                cancelButtonText: 'Cancel'
+            });
+
+            if (result.isConfirmed) {
                 try {
                     const response = await fetch(`/delete-post/${postId}`, {
                         method: 'DELETE',
@@ -412,14 +423,23 @@
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         }
                     });
+
                     if (response.ok) {
-                        location.reload(); // Refresh to remove deleted post
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'The post has been deleted successfully.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
                     } else {
-                        alert('Failed to delete post');
+                        Swal.fire('Failed', 'Could not delete the post.', 'error');
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('An error occurred');
+                    Swal.fire('Error', 'An unexpected error occurred.', 'error');
                 }
             }
         }

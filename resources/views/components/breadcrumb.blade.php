@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto pl-6 pt-2 pb-2">
+<div class="max-w-7xl mx-auto pl-6 pt-2 pb-2 bg-gray-100">
     <nav class="text-sm m-0" aria-label="Breadcrumb">
         <ol class="flex items-center space-x-2">
             @foreach ($links as $i => $link)
