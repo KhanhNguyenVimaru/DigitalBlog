@@ -52,6 +52,11 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::post('/comments', [CommentController::class, 'store'])->name('comments.store')->middleware('auth');
 Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy')->middleware('auth');
 
+// LIKE/DISLIKE ROUTES
+Route::post('/like', [App\Http\Controllers\LikeController::class, 'like'])->name('like')->middleware('auth');
+Route::post('/dislike', [App\Http\Controllers\LikeController::class, 'dislike'])->name('dislike')->middleware('auth');
+Route::get('/count-like/{id}', [App\Http\Controllers\LikeController::class, 'countLike'])->name('countLike');
+
 // FOLLOW/UNFOLLOW USER
 Route::get('/follow_user/{id}',[FollowUserController::class, 'followUser'])->name('followUser')->middleware('auth');
 Route::delete('/delete_follow/{id}', [FollowUserController::class, 'deleteFollow'])->name('deleteFollow')->middleware('auth');

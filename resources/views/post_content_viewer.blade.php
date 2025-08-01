@@ -62,7 +62,7 @@
         @include('components.breadcrumb', [
             'links' => \App\Http\Controllers\Controller::generateBreadcrumbLinks(),
         ])
-        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8 mt-0 pt-0 mb-10">
+        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8 mt-0 pt-0 mb-5">
             @if ($category)
                 <a
                     href="#"class="text-xs text-blue-600 hover:underline font-semibold mb-4 inline-block uppercase tracking-wide my-4">{{ $category }}</a>
@@ -80,7 +80,39 @@
                     <span class="text-xs text-gray-400 font-normal">{{ $created_at ?? '' }}</span>
                 </div>
             </div>
-            <div class="editorjs-content text-gray-800" id="editorjs-render"></div>
+            <div class="editorjs-content text-gray-800" id="editorjs-render">
+            </div>
+            <hr class="w-[100%] h-[0.5px] bg-gray-400 border-0">
+
+            <!-- Like/Dislike Section -->
+            <div class="flex items-center justify-end space-x-6 mt-8 mb-6">
+                <div class="flex items-center space-x-2">
+                    <button id="like-btn" onclick="likePost({{ $post_id }})"
+                        class="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-blue-50 hover:border-blue-300 transition-colors">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5">
+                            </path>
+                        </svg>
+                        <span id="like-count" class="text-gray-700 font-medium">{{ $countlike }}</span>
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <button id="dislike-btn" onclick="dislikePost({{ $post_id }})"
+                        class="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-300 hover:bg-red-50 hover:border-red-300 transition-colors">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v5a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2">
+                            </path>
+                        </svg>
+                        <span id="dislike-count" class="text-gray-700 font-medium">{{ $countdislike }}</span>
+                    </button>
+                </div>
+            </div>
+            <div>
+
+            </div>
         </div>
 
         <!-- Comments Section -->
@@ -222,7 +254,7 @@
                             break;
                         case 'raw':
                             html +=
-                            `<pre class="bg-gray-100 rounded p-2 overflow-x-auto mb-3">${block.data.html}</pre>`;
+                                `<pre class="bg-gray-100 rounded p-2 overflow-x-auto mb-3">${block.data.html}</pre>`;
                             break;
                         case 'simpleImage':
                             html +=
@@ -234,6 +266,7 @@
                 });
                 holder.innerHTML = html;
             }
+
             window.contentData = @json(json_decode($json));
             if (window.contentData && document.getElementById('editorjs-render')) {
                 renderPostContent('editorjs-render', window.contentData);
@@ -312,7 +345,7 @@
                                     }
 
                                     const commentCount = document.querySelector('h3').textContent.match(
-                                    /\((\d+)\)/);
+                                        /\((\d+)\)/);
                                     if (commentCount) {
                                         const newCount = parseInt(commentCount[1]) - 1;
                                         document.querySelector('h3').textContent = `Comments (${newCount})`;
@@ -345,6 +378,129 @@
                     notification.remove();
                 }, 3000);
             }
+
+            // Like/Dislike functionality
+            function likePost(postId) {
+                const likeBtn = document.getElementById('like-btn');
+                const dislikeBtn = document.getElementById('dislike-btn');
+                const likeCountElement = document.getElementById('like-count');
+                const currentLikeCount = likeCountElement ? likeCountElement.textContent : '0';
+
+                // Add loading state
+                likeBtn.disabled = true;
+                likeBtn.innerHTML =
+                    '<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+
+                fetch('/like', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            post_id: postId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Post liked successfully!', 'success');
+                            updateLikeCounts(postId);
+
+                            // Update button states
+                            likeBtn.classList.add('bg-blue-100', 'border-blue-400', 'text-blue-700');
+                            dislikeBtn.classList.remove('bg-red-100', 'border-red-400', 'text-red-700');
+                        } else {
+                            showNotification(data.message || 'Failed to like post', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('An error occurred while liking the post', 'error');
+                    })
+                    .finally(() => {
+                        // Restore button
+                        likeBtn.disabled = false;
+                        likeBtn.innerHTML = `<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
+                    </svg>
+                    <span id="like-count" class="text-gray-700 font-medium">${currentLikeCount}</span>`;
+                    });
+            }
+
+            function dislikePost(postId) {
+                const likeBtn = document.getElementById('like-btn');
+                const dislikeBtn = document.getElementById('dislike-btn');
+                const dislikeCountElement = document.getElementById('dislike-count');
+                const currentDislikeCount = dislikeCountElement ? dislikeCountElement.textContent : '0';
+
+                // Add loading state
+                dislikeBtn.disabled = true;
+                dislikeBtn.innerHTML =
+                    '<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+
+                fetch('/dislike', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            post_id: postId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Post disliked successfully!', 'success');
+                            updateLikeCounts(postId);
+
+                            // Update button states
+                            dislikeBtn.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+                            likeBtn.classList.remove('bg-blue-100', 'border-blue-400', 'text-blue-700');
+                        } else {
+                            showNotification(data.message || 'Failed to dislike post', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('An error occurred while disliking the post', 'error');
+                    })
+                    .finally(() => {
+                        // Restore button
+                        dislikeBtn.disabled = false;
+                        dislikeBtn.innerHTML = `<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v5a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2"></path>
+                    </svg>
+                    <span id="dislike-count" class="text-gray-700 font-medium">${currentDislikeCount}</span>`;
+                    });
+            }
+
+            function updateLikeCounts(postId) {
+                fetch(`/count-like/${postId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('like-count').textContent = data.likeCount;
+                            document.getElementById('dislike-count').textContent = data.dislikeCount;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating counts:', error);
+                    });
+            }
+
+            // Load initial like/dislike counts
+            document.addEventListener('DOMContentLoaded', function() {
+                updateLikeCounts({{ $post_id }});
+            });
         </script>
         @include('footer')
     </body>

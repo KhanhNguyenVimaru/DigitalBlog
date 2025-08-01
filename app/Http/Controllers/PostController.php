@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Models\comment;
+use App\Models\like;
 
 class PostController extends Controller
 {
@@ -196,13 +197,21 @@ class PostController extends Controller
     public function viewContentJson($id)
     {
         $post = post::with('category', 'author')->findOrFail($id);
-        
+
         // Lấy comments của post này, sắp xếp theo thời gian mới nhất
         $comments = \App\Models\Comment::with('user')
             ->where('post_id', $id)
             ->orderBy('created_at', 'desc')
             ->get();
-        
+
+        $countlike = like::where('post_id', $id)
+            ->where('like', true)
+            ->count();
+
+        $countdislike = like::where('post_id', $id)
+            ->where('like', false)
+            ->count();
+
         return view('post_content_viewer', [
             'content' => $post->content,
             'title' => $post->title,
@@ -213,58 +222,8 @@ class PostController extends Controller
             'created_at' => $post->created_at->format('Y-m-d') ? $post->created_at->format('Y-m-d') : 'Unknown',
             'comments' => $comments, // Thêm comments vào view
             'post_id' => $id, // Thêm post_id để sử dụng trong form comment
+            'countlike' => $countlike,
+            'countdislike' => $countdislike
         ]);
-    }
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorepostRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(post $post)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(post $post)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatepostRequest $request, post $post)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(post $post)
-    {
-        //
     }
 }
