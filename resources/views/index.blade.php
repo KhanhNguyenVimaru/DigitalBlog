@@ -52,26 +52,30 @@
     </div>
 
     <!-- Post Section -->
-    <div class="w-full h-[50vh] mt-4 ">
-        <div class = "w-100% my-9 flex flex-row">
-            <h4 class = "ml-20 font-bold">TOP BEST</h4>
-            <a href="" class="text-gray-500 ml-10">Top Highlighted Posts</a>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 px-18" id="top-posts">
-            <div class="bg-white p-3 rounded shadow">
-                Bài viết 1
+    <div class="w-full mt-4 min-h-[60vh]">
+        <div class="max-w-screen-xl mx-auto">
+            <div class="my-9 flex flex-row items-center">
+                <h4 class="ml-4 md:ml-6 font-bold text-xl">TOP BEST</h4>
+                <a href="#" class="text-gray-500 ml-6 text-base">Top Highlighted Posts</a>
             </div>
-            <div class="bg-white p-3 rounded shadow">
-                Bài viết 1
-            </div>
-            <div class="bg-white p-3 rounded shadow">
-                Bài viết 1
-            </div>
-            <div class="bg-white p-3 rounded shadow">
-                Bài viết 1
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4" id="top-posts">
+                @foreach ($topLikedPosts as $post)
+                    <div class="bg-white p-4 rounded shadow">
+                        <a href="{{ url('/post-content-viewer/' . $post->id) }}">
+                            <img src="{{ $post->additionFile ?? '/images/free-images-for-blog.png' }}"
+                                onerror="this.src='/images/free-images-for-blog.png'" alt="Post Image"
+                                class="w-full h-36 object-cover rounded-md bg-gray-100" />
+                            <span class="font-bold mt-2 line-clamp-2 h-[56px]">
+                                {{ $post->title ?? 'Untitled Post' }}
+                            </span>
+                        </a>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
+
     @include('footer')
 
     <!-- Flowbite JS -->

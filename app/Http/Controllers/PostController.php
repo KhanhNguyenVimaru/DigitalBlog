@@ -19,11 +19,15 @@ class PostController extends Controller
 {
     public function topBestPost()
     {
-        $topLikedPosts = post::withCount('likes')
+        $topLikedPosts = Post::withCount('likes')
             ->whereBetween('created_at', [
                 Carbon::now()->subDays(7)->startOfDay(),
                 Carbon::now()->endOfDay()
             ])
+            ->where('status', 'public')
+            ->whereHas('author', function ($query) {
+                $query->where('privacy', 'public');
+            })  
             ->orderBy('likes_count', 'desc')
             ->limit(4)
             ->get();

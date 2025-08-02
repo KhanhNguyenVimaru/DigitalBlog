@@ -12,6 +12,7 @@ use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\post;
 
 class User extends Authenticatable
 {
@@ -60,5 +61,8 @@ class User extends Authenticatable
     }
     public function like(){
         return $this->hasMany(\App\Models\comment::class, 'post_id');
+    }
+    public function post(){
+        return $this->hasMany(User::class);
     }
 }
