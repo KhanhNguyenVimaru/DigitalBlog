@@ -12,7 +12,6 @@
         <div class="flex flex-1 justify-center min-w-0 relative" id="nav-links">
             <a href="/" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Feed</a>
             <a href="/writing" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Writing</a>
-            <a href="#" class="text-sm font-semibold text-gray-600 hover:text-black px-4">Community</a>
             <a href="#" id="notification-bell"
                 class="text-sm font-semibold text-gray-600 hover:text-black px-4 relative">Notification
                 <div id="notification-dropdown"
@@ -23,6 +22,8 @@
             </a>
             <a href="#" id="search-nav-link"
                 class="text-sm font-semibold text-gray-600 hover:text-black px-4">Search</a>
+            <a href="" class="text-sm font-semibold text-gray-600 hover:text-black px-4 whitespace-nowrap">About Us</a>
+
         </div>
         <div class="flex flex-1 justify-end min-w-0 items-center gap-3 relative">
             <div id="search-input-wrapper"
@@ -30,10 +31,9 @@
                 <input id="search-input" type="text" placeholder="Search..."
                     class="w-1/2 min-w-[200px] max-w-xl px-4 py-2 border border-gray-300 rounded-full shadow focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm bg-white" />
             </div>
-            @if(!$user)
-                <a id="login-link" href="/page_login"
-                    class="text-sm font-semibold text-gray-600 hover:text-black">Log in<span
-                        aria-hidden="true">&rarr;</span></a>
+            @if (!$user)
+                <a id="login-link" href="/page_login" class="text-sm font-semibold text-gray-600 hover:text-black">Log
+                    in<span aria-hidden="true">&rarr;</span></a>
             @else
                 <div id="account-dropdown-wrapper" class="relative">
                     <button id="account-link" type="button"
@@ -156,37 +156,37 @@
 
                 if (dropdown.classList.contains('hidden')) {
                     fetch('/loadUserNotify', {
-                        method: 'GET',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(res => res.json())
-                    .then(notifies => {
-                        let html =
-                            '<div class="font-semibold text-gray-700 mb-2">Notifications</div>';
-                        if (!notifies.length) {
-                            html +=
-                                '<div class="text-gray-500 text-sm">No notifications yet.</div>';
-                        } else {
-                            html += notifies.map(n => {
-                                let userSentId = n.send_from_id;
-                                if (n.type === 'follow_request') {
-                                    return `<div 
+                            method: 'GET',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(notifies => {
+                            let html =
+                                '<div class="font-semibold text-gray-700 mb-2">Notifications</div>';
+                            if (!notifies.length) {
+                                html +=
+                                    '<div class="text-gray-500 text-sm">No notifications yet.</div>';
+                            } else {
+                                html += notifies.map(n => {
+                                    let userSentId = n.send_from_id;
+                                    if (n.type === 'follow_request') {
+                                        return `<div
                                     class="flex items-center justify-between gap-2 py-2 hover:bg-gray-50 h-[40px]"
                                     onclick="window.location.href='${window.userProfileUrlBase}${userSentId}'">
                                     <span class="text-sm text-gray-600 flex-1">${n.notify_content || 'You have a new follow request.'}</span>
                                     <button class="cursor-pointer hover:bg-blue-300 accept-follow-btn bg-blue-500 text-white px-2 py-1 rounded text-xs mr-1" data-id="${n.id}" onclick = "acceptRequest(${n.id}, ${n.send_from_id})">Accept</button>
                                     <button class="cursor-pointer hover:bg-gray-300 reject-follow-btn bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs" data-id="${n.id}" onclick = "denyRequest(${n.id}, ${n.send_from_id})">X</button>
                                 </div>`;
-                                } else {
-                                    return `<div onclick="window.location.href='${window.userProfileUrlBase}${userSentId}'" class="h-[40px] text-sm py-2 cursor-pointer hover:bg-gray-50 text-gray-600">${n.notify_content || 'You have a new notification.'}</div>`;
-                                }
-                            }).join('');
-                        }
-                        dropdown.innerHTML = html;
-                    });
+                                    } else {
+                                        return `<div onclick="window.location.href='${window.userProfileUrlBase}${userSentId}'" class="h-[40px] text-sm py-2 cursor-pointer hover:bg-gray-50 text-gray-600">${n.notify_content || 'You have a new notification.'}</div>`;
+                                    }
+                                }).join('');
+                            }
+                            dropdown.innerHTML = html;
+                        });
                 }
                 dropdown.classList.toggle('hidden');
             });

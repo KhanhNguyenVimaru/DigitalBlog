@@ -40,7 +40,7 @@
         'links' => \App\Http\Controllers\Controller::generateBreadcrumbLinks()
     ])
     <div class="min-h-screen bg-gray-100 flex flex-col items-center py-0 mt-0 pt-0">
-        <div class="w-full max-w-4xl bg-white rounded-lg shadow-md p-8">
+        <div class="w-full max-w-4xl bg-white rounded-lg shadow-md p-8 mb-5">
             <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Create New Post</h2>
             <div class="a4-wrapper">
                 <label class="block mb-2 text-sm font-medium text-gray-700">Title</label>

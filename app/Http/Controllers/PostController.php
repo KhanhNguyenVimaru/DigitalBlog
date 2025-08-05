@@ -14,12 +14,17 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\comment;
 use App\Models\like;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
+
 
 class PostController extends Controller
 {
-    public function topBestPost()
+    public function homePosts()
     {
+        // Lấy bài viết được like nhiều trong 7 ngày qua
         $topLikedPosts = Post::withCount('likes')
+            ->with('category')
             ->whereBetween('created_at', [
                 Carbon::now()->subDays(7)->startOfDay(),
                 Carbon::now()->endOfDay()
@@ -27,12 +32,39 @@ class PostController extends Controller
             ->where('status', 'public')
             ->whereHas('author', function ($query) {
                 $query->where('privacy', 'public');
-            })  
+            })
             ->orderBy('likes_count', 'desc')
             ->limit(4)
             ->get();
 
-        return view('index', compact('topLikedPosts'));
+        // Lấy tất cả bài viết phân trang
+        $allPosts = Post::with('category')
+            ->where('status', 'public')
+            ->whereHas('author', function ($query) {
+                $query->where('privacy', 'public');
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(5, ['*'], 'show-page');
+
+        // Thêm preview vào bài viết
+        $allPosts->getCollection()->transform(function ($post) {
+            $preview = '';
+            $contentArr = json_decode($post->content, true);
+
+            if (isset($contentArr['blocks'])) {
+                foreach ($contentArr['blocks'] as $block) {
+                    if (isset($block['data']['text'])) {
+                        $preview .= strip_tags($block['data']['text']) . ' ';
+                    }
+                }
+                $preview = Str::limit(trim($preview), 180);
+            }
+
+            $post->preview = $preview;
+            return $post;
+        });
+
+        return view('index', compact('topLikedPosts', 'allPosts'));
     }
 
     public function loadLink($request)

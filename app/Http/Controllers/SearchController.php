@@ -17,6 +17,7 @@ class SearchController extends Controller
             ->whereHas('author', function ($q) {
                 $q->where('privacy', 'public');
             })
+            ->orderBy('created_at', 'desc')
             ->get();
         $users = User::where('name', 'like', "%$query%")
             ->orWhere('email', 'like', "%$query%")
