@@ -107,7 +107,7 @@
                             <a href="{{ url('/post-content-viewer/' . $post->id) }}"
                                 class="font-bold text-base text-black cursor-pointer hover:text-blue-600 hover:underline line-clamp-1"
                                 style="text-decoration: none; font-size:18px">
-                                {{ $post->title ?? 'Không có tiêu đề' }}
+                                {{ $post->title ?? '' }}
                             </a>
 
                             <div class="text-gray-600 text-sm my-2">
@@ -115,9 +115,9 @@
                             </div>
 
                             <div class="flex items-center justify-between mt-1 w-full">
-                                <span class="text-sm text-gray-700 font-medium">
-                                    {{ $post->author->name ?? 'Tác giả ẩn danh' }}
-                                </span>
+                                <a href="{{ url('/user-profile/' . $post->author->id) }}" class="text-sm text-gray-700 font-medium hover:text-blue-600 cursor-pointer">
+                                    {{ $post->author->name ?? '' }}
+                                </a>
 
                                 <div class="flex items-center gap-2">
                                     <span

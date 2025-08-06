@@ -51,9 +51,9 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
         $user = User::withTrashed()->where('email', $request->email)->first();
-        if(!$user){
+        if (!$user) {
             return response()->json(['error' => 'Your account does not exist']);
-        }else if($user->trashed()){
+        } else if ($user->trashed()) {
             $user->restore();
         }
 
@@ -78,6 +78,9 @@ class AuthController extends Controller
             $token->revoke();
             $token->delete();
         });
+        Auth::guard('web')->logout();        // hoặc Auth::logout() nếu dùng mặc định
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return response()->json(['message' => 'Successfully logged out']);
     }
 
