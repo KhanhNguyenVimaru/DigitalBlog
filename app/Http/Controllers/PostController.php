@@ -21,6 +21,132 @@ use App\Models\User;
 
 class PostController extends Controller
 {
+    public function categoryPosts($categoryId, $sortBy = 'latest')
+    {
+        $category = Category::findOrFail($categoryId);
+
+        $query = Post::with(['category', 'author'])
+            ->withCount(['likes', 'comment'])
+            ->where('status', 'public')
+            ->where('categoryId', $categoryId)
+            ->whereHas('author', function ($query) {
+                $query->where('privacy', 'public');
+            });
+
+        // Apply sorting based on filter
+        switch ($sortBy) {
+            case 'popular':
+                $query->orderByDesc('likes_count');
+                break;
+            case 'interaction':
+                $query->orderByDesc('comment_count');
+                break;
+            default:
+                $query->orderByDesc('created_at');
+                break;
+        }
+
+        // Fetch paginated posts
+        $posts = $query->paginate(5, ['*'], 'show-page')->appends(['filter' => $sortBy]);
+
+        // Transform posts to include preview
+        $posts->getCollection()->transform(function ($post) {
+            $preview = '';
+            $contentArr = json_decode($post->content, true);
+
+            if (isset($contentArr['blocks'])) {
+                foreach ($contentArr['blocks'] as $block) {
+                    if (isset($block['data']['text'])) {
+                        $preview .= strip_tags($block['data']['text']) . ' ';
+                    }
+                }
+            }
+
+            $post->preview = Str::limit(trim($preview), 180);
+            return $post;
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Posts retrieved successfully',
+            'posts' => $posts
+        ]);
+    }
+    public function categoryPage($id)
+    {
+        $pageId = $id;
+            $allCategory = Category::all(); 
+            $bestAuthors = User::select('users.*')
+                ->addSelect([
+                    'likes_count' => DB::table('likes')
+                        ->join('posts', 'posts.id', '=', 'likes.post_id')
+                        ->whereColumn('posts.authorId', 'users.id')
+                        ->selectRaw('COUNT(*)')
+                ])
+                ->having('likes_count', '>', 0)
+                ->orderByDesc('likes_count')
+                ->limit(3)
+                ->get();
+
+            $category = Category::findOrFail($id);
+
+            // Fetch the first public post for the header image
+            $firstPost = Post::where('categoryId', $id)
+                ->where('status', 'public')
+                ->whereHas('author', function ($query) {
+                    $query->where('privacy', 'public');
+                })
+                ->first();
+
+            return view('categoryPage', compact('category', 'bestAuthors', 'allCategory', 'firstPost', 'pageId'));
+    }
+
+    public function allPosts($sortBy = 'latest')
+    {
+        $query = Post::with(['category', 'author'])
+            ->withCount(['likes', 'comment'])
+            ->where('status', 'public')
+            ->whereHas('author', function ($query) {
+                $query->where('privacy', 'public');
+            });
+
+        // Apply sorting based on filter
+        switch ($sortBy) {
+            case 'popular':
+                $query->orderByDesc('likes_count');
+                break;
+            case 'interaction':
+                $query->orderByDesc('comment_count');
+                break;
+            default:
+                $query->orderByDesc('created_at');
+                break;
+        }
+
+        $allPosts = $query->paginate(5, ['*'], 'show-page')->appends(['filter' => $sortBy]);
+
+        $allPosts->getCollection()->transform(function ($post) {
+            $preview = '';
+            $contentArr = json_decode($post->content, true);
+
+            if (isset($contentArr['blocks'])) {
+                foreach ($contentArr['blocks'] as $block) {
+                    if (isset($block['data']['text'])) {
+                        $preview .= strip_tags($block['data']['text']) . ' ';
+                    }
+                }
+            }
+
+            $post->preview = Str::limit(trim($preview), 180);
+            return $post;
+        });
+
+        return response()->json([
+            'posts' => $allPosts,
+            'success' => true,
+            'message' => 'Posts retrieved successfully'
+        ]);
+    }
     public function homePosts()
     {
         $bestAuthors = User::select('users.*')
@@ -35,8 +161,8 @@ class PostController extends Controller
             ->limit(3)
             ->get();
 
-        $allCategory = category::all();
-        // Lấy bài viết được like nhiều trong 7 ngày qua
+        $allCategory = Category::all();
+
         $topLikedPosts = Post::withCount('likes')
             ->with('category')
             ->whereBetween('created_at', [
@@ -51,34 +177,7 @@ class PostController extends Controller
             ->limit(4)
             ->get();
 
-        // Lấy tất cả bài viết phân trang
-        $allPosts = Post::with('category')
-            ->where('status', 'public')
-            ->whereHas('author', function ($query) {
-                $query->where('privacy', 'public');
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(5, ['*'], 'show-page');
-
-        // Thêm preview vào bài viết
-        $allPosts->getCollection()->transform(function ($post) {
-            $preview = '';
-            $contentArr = json_decode($post->content, true);
-
-            if (isset($contentArr['blocks'])) {
-                foreach ($contentArr['blocks'] as $block) {
-                    if (isset($block['data']['text'])) {
-                        $preview .= strip_tags($block['data']['text']) . ' ';
-                    }
-                }
-                $preview = Str::limit(trim($preview), 180);
-            }
-
-            $post->preview = $preview;
-            return $post;
-        });
-
-        return view('index', compact('topLikedPosts', 'allPosts', 'allCategory', 'bestAuthors'));
+        return view('index', compact('topLikedPosts', 'allCategory', 'bestAuthors'));
     }
 
     public function loadLink($request)

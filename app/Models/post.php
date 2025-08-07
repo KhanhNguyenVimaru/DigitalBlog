@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
-
+use App\Models\Comment;
 class post extends Model
 {
     /** @use HasFactory<\Database\Factories\PostFactory> */
@@ -32,7 +32,7 @@ class post extends Model
         return $this->belongsTo(User::class, 'authorId');
     }
     public function comment(){
-        return $this->hasMany(\App\Models\comment::class, 'post_id');
+        return $this->hasMany(Comment::class, 'post_id');
     }
     public function likes(){
         return $this->hasMany(\App\Models\like::class, 'post_id');

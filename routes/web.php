@@ -25,7 +25,7 @@ Route::get('/writing', function () { return view('writing');})->name('writing')-
 Route::get('/post-content-viewer/{id}', [PostController::class, 'viewContentJson'])->name('post.content.viewer');
 Route::get('/user-profile/{id}', [UserController::class, 'userProfile'])->name('userProfile')->middleware(accessUserProfile::class);// User profile
 Route::get('/loadUserNotify',[NotifyController::class, 'loadUserNotify'])->name('loadUserNotify')->middleware('auth');
-Route::get('/category/{id}', [CategoryController::class, 'categoryPage'])->name('categoryPage');
+Route::get('/category/{id}', [PostController::class, 'categoryPage'])->name('categoryPage');
 // LOGIN/OUT HANDLE
 Route::post('/handle_login', [AuthController::class, 'login']);
 Route::post('/handle_signup', [AuthController::class, 'signup'])->name('register');
@@ -48,6 +48,8 @@ Route::get('/search-suggest', [UserController::class, 'searchSuggest'])->name('s
 Route::get('/content-of-author/{id}', [PostController::class, 'contentOfAuthor'])->name('contentOfAuthor'); //  content of author là bài viết của người dùng khác
 Route::match(['get', 'post'], '/fetchUrl',[PostController::class, 'loadLink'])->name('fetchUrl')->middleware('auth');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::get('/api/posts/{sortBy?}', [PostController::class, 'allPosts']);
+Route::get('/api/category/{categoryId}/posts/{sortBy?}', [PostController::class, 'categoryPosts']);
 // COMMENT ROUTES
 Route::post('/comments', [CommentController::class, 'store'])->name('comments.store')->middleware('auth');
 Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy')->middleware('auth');
