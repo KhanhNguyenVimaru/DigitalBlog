@@ -63,13 +63,25 @@
                                 class="font-bold text-base text-black cursor-pointer post-title-hover block truncate hover:text-blue-600 hover:underline-0"
                                 style="text-decoration: none;">{{ $post->title }}</a>
                             <div class="text-gray-600 text-sm mt-1 truncate">{{ $preview }}</div>
-                            <div class="flex flex-row items-center gap-2 mt-2">
-                                <span
-                                    class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold cursor-pointer">{{ $categoryName }}</span>
-                                <span
-                                    class="px-2 py-1 rounded text-xs {{ $post->status === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700' }} cursor-pointer">{{ $status }}</span>
-                                <span class="text-xs text-gray-400 ml-auto">{{ $createdAt }}</span>
+                            <div class="flex flex-row justify-between items-center mt-2">
+                                <!-- Bên trái: user -->
+                                <a class="text-sm text-gray-700 font-medium hover:text-blue-600 cursor-pointer" href="{{ url('/user-profile/' . $post->authorId) }}">
+                                    {{ $post->author->name ?? 'Unknown Author' }}
+                                </a>
+
+                                <!-- Bên phải: category + createdAt -->
+                                <div class="flex flex-row items-center gap-2 pr-5">
+                                    <span
+                                        class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold cursor-pointer">
+                                        {{ $categoryName }}
+                                    </span>
+                                    <span class="text-xs text-gray-400">
+                                        {{ $createdAt }}
+                                    </span>
+                                </div>
                             </div>
+
+
                         </div>
                     </div>
                 @empty

@@ -12,7 +12,8 @@ class SearchController extends Controller
     public function index(Request $request)
     {
         $query = $request->input('query');
-        $posts = post::where('title', 'like', "%$query%")
+        $posts = post::with('author')
+            ->where('title', 'like', "%$query%")
             ->where('status', 'public')
             ->whereHas('author', function ($q) {
                 $q->where('privacy', 'public');
