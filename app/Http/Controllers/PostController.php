@@ -75,7 +75,7 @@ class PostController extends Controller
     public function categoryPage($id)
     {
         $pageId = $id;
-            $allCategory = Category::all(); 
+            $allCategory = Category::all();
             $bestAuthors = User::select('users.*')
                 ->addSelect([
                     'likes_count' => DB::table('likes')
@@ -163,7 +163,9 @@ class PostController extends Controller
 
         $allCategory = Category::all();
 
-        $topLikedPosts = Post::withCount('likes')
+        $topLikedPosts = Post::withCount(['likes' => function ($query) {
+            $query->where('like', true);
+        }])
             ->with('category')
             ->whereBetween('created_at', [
                 Carbon::now()->subDays(7)->startOfDay(),
