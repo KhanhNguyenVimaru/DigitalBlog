@@ -63,6 +63,10 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\comment::class, 'post_id');
     }
     public function post(){
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class, 'authorId');
+    }
+    public function likesThroughPosts()
+    {
+        return $this->hasManyThrough(like::class, post::class);
     }
 }

@@ -16,12 +16,36 @@ use App\Models\like;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-
+use App\Models\category;
+use App\Models\User;
 
 class PostController extends Controller
 {
     public function homePosts()
     {
+        $bestAuthors = User::select('users.*')
+            ->addSelect([
+                'likes_count' => DB::table('likes')
+                    ->join('posts', 'posts.id', '=', 'likes.post_id')
+                    ->whereColumn('posts.authorId', 'users.id')
+                    ->selectRaw('COUNT(*)')
+            ])
+            ->having('likes_count', '>', 0)
+            ->orderByDesc('likes_count')
+            ->limit(3)
+            ->get();
+
+        // $users = User::withCount('likesThroughPosts')
+        //     ->having('likes_through_posts_count', '>', 0)
+        //     ->orderByDesc('likes_through_posts_count')
+        //     ->limit(3)
+        //     ->get();
+
+        // $posts = Post::withCount('comments')
+        //     ->having('comments_count', '>', 5)
+        //     ->get();
+
+        $allCategory = category::all();
         // Lấy bài viết được like nhiều trong 7 ngày qua
         $topLikedPosts = Post::withCount('likes')
             ->with('category')
@@ -64,7 +88,7 @@ class PostController extends Controller
             return $post;
         });
 
-        return view('index', compact('topLikedPosts', 'allPosts'));
+        return view('index', compact('topLikedPosts', 'allPosts', 'allCategory', 'bestAuthors'));
     }
 
     public function loadLink($request)
