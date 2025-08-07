@@ -5,71 +5,50 @@ namespace App\Http\Controllers;
 use App\Models\category;
 use App\Http\Requests\StorecategoryRequest;
 use App\Http\Requests\UpdatecategoryRequest;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function categoryPage($id)
     {
-        //
-    }
+        $allCategory = category::all();
+        $bestAuthors = User::select('users.*')
+            ->addSelect([
+                'likes_count' => DB::table('likes')
+                    ->join('posts', 'posts.id', '=', 'likes.post_id')
+                    ->whereColumn('posts.authorId', 'users.id')
+                    ->selectRaw('COUNT(*)')
+            ])
+            ->having('likes_count', '>', 0)
+            ->orderByDesc('likes_count')
+            ->limit(3)
+            ->get();
 
-    /**
-     * Get all categories for select dropdown
-     */
-    public function getAllCategories()
-    {
-        $categories = category::all();
-        return response()->json($categories);
-    }
+        $category = category::findOrFail($id);
+        $posts = Category::findOrFail($id)->posts()->paginate(5, ['*'], 'show-page');
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $posts->getCollection()->transform(function ($post) {
+            $preview = '';
+            $contentArr = json_decode($post->content, true);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorecategoryRequest $request)
-    {
-        //
-    }
+            if (isset($contentArr['blocks'])) {
+                foreach ($contentArr['blocks'] as $block) {
+                    if (isset($block['data']['text'])) {
+                        $preview .= strip_tags($block['data']['text']) . ' ';
+                    }
+                }
+                $preview = Str::limit(trim($preview), 180);
+            }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(category $category)
-    {
-        //
-    }
+            $post->preview = $preview;
+            return $post;
+        });
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(category $category)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatecategoryRequest $request, category $category)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(category $category)
-    {
-        //
+        return view('categoryPage', compact('category', 'posts', 'bestAuthors', 'allCategory'));
     }
 }

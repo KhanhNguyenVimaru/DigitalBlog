@@ -12,76 +12,20 @@
 </head>
 
 @include('header')
-<div id="animation-carousel" class="relative w-full" data-carousel="slide" data-carousel-interval="10000000">
-    <!-- Carousel wrapper -->
-    <div class="relative h-56 overflow-hidden md:h-96">
-        <!-- Item 1 -->
-        <div class="hidden transition-all duration-1000 ease-in-out" data-carousel-item>
-            <img src="{{ asset('images/carousel_img/image_1.png') }}"
-                class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="...">
-        </div>
-        <!-- Item 2 -->
-        <div class="hidden transition-all duration-1000 ease-in-out" data-carousel-item="active">
-            <img src="{{ asset('images/carousel_img/image_2.png') }}"
-                class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="...">
-        </div>
-    </div>
-
-    <!-- Slider controls -->
-    <button type="button"
-        class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-        data-carousel-prev>
-        <svg class="w-6 h-6 text-white group-hover:text-gray-300 transition-colors" aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M5 1 1 5l4 4" />
-        </svg>
-        <span class="sr-only">Previous</span>
-    </button>
-    <button type="button"
-        class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-        data-carousel-next>
-        <svg class="w-6 h-6 text-white group-hover:text-gray-300 transition-colors" aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="m1 9 4-4-4-4" />
-        </svg>
-        <span class="sr-only">Next</span>
-    </button>
-</div>
-
-<!-- Post Section -->
-<div class="w-full mt-4 min-h-[54vh]">
-    <div class="max-w-screen-xl mx-auto">
-        <div class="my-9 flex flex-row items-center">
-            <h4 class="ml-4 md:ml-6 font-bold text-xl">TOP BEST</h4>
-            <a href="#" class="text-gray-500 ml-6 text-base">Top Highlighted Posts</a>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4" id="top-posts">
-            @foreach ($topLikedPosts as $post)
-                <div class="bg-white p-4 rounded shadow hover:shadow-lg transition-shadow duration-300">
-                    <a href="{{ url('/post-content-viewer/' . $post->id) }}" class="hover:text-blue-600">
-                        <img src="{{ $post->additionFile ?? '/images/free-images-for-blog.png' }}"
-                            onerror="this.src='/images/free-images-for-blog.png'" alt="Post Image"
-                            class="w-full h-36 object-cover rounded-md bg-gray-100" />
-                        <span class="font-bold mt-2 line-clamp-2 h-[48px] mb-4">
-                            {{ $post->title ?? 'Untitled Post' }}
-                        </span>
-                    </a>
-                    <div class="flex flex-row items-center gap-2 mt-2">
-                        <a class="text-sm text-gray-700 font-medium hover:text-blue-600 cursor-pointer" href="{{ url('/user-profile/' . $post->authorId) }}"
-                            class="font-semibold text-gray-800 hover:text-blue-600">
-                            {{ $post->author->name }}
-                        </a>
-                        <span class="ml-auto inline-block truncate px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold cursor-pointer">{{ $post->category->content ?? 'No Category' }}</span>
-                    </div>
-                </div>
-            @endforeach
-        </div>
+<div class="relative w-full h-50 md:h-96 flex items-start justify-center" style="background-color: rgb(234, 234, 234);">
+    <div class = "flex items-center mt-28">
+         <img src="{{ $post->additionFile ?? '/images/free-images-for-blog.png' }}" alt="Post Image"
+                            class="w-32 h-32 object-cover rounded-md bg-gray-100 flex-shrink-0"
+                            onerror="this.src='/images/free-images-for-blog.png'">
+        <h1 class="text-2xl md:text-5xl font-semibold text-gray-800 text-center ml-10" style="font-family: bahnschrift; color: rgb(82, 103, 187);">
+        {{ strtoupper($category->content) ?? '' }}
+    </h1>
     </div>
 </div>
-<div class="w-full mt-4 min-h-[100vh]">
+
+
+
+<div class="w-full mt-4 min-h-[100vh] mt-14">
     <div class="max-w-screen-xl mx-auto h-full pb-5">
 
         <!-- Điều hướng -->
@@ -96,7 +40,7 @@
             <!-- Cột chính 9/12 -->
             {{-- Vùng hiển thị các bài viết phân trang --}}
             <div class="col-span-9 p-4" id="show-all-posts">
-                @forelse ($allPosts as $post)
+                @forelse ($posts as $post)
                     <div
                         class="bg-white rounded-lg shadow p-4 pr-6 flex flex-row gap-6 items-center mb-4 hover:shadow-lg transition min-h-[120px]">
                         {{-- Ảnh bài viết --}}
@@ -140,7 +84,7 @@
 
                 {{-- Phân trang --}}
                 <div class="flex justify-center mt-6">
-                    {{ $allPosts->links() }}
+                    {{ $posts->links() }}
                 </div>
             </div>
 
@@ -152,12 +96,10 @@
                     @forelse ($bestAuthors as $author)
                         <div class="w-full flex items-center py-2 border-b border-gray-200">
                             <div class="flex-shrink-0">
-                                <img src="{{ $author->avatar }}" alt="{{ $author->name }}"
-                                    class="w-10 h-10 rounded-full">
+                                <img src="{{ $author->avatar }}" alt="{{ $author->name }}" class="w-10 h-10 rounded-full">
                             </div>
                             <div class="ml-3">
-                                <a href="{{ url('/user-profile/' . $author->id) }}"
-                                    class="font-semibold text-gray-800 hover:text-blue-600">
+                                <a href="{{ url('/user-profile/' . $author->id) }}" class="font-semibold text-gray-800 hover:text-blue-600">
                                     {{ $author->name }}
                                 </a>
                             </div>
@@ -167,14 +109,14 @@
 
                 <div class="w-full mt-8">
                     <div class='w-full p-4 bg-white shadow-md rounded-xl'>
-                        <h4 class="mb-4 text-base text-black">ALL TOPICS</h4>
-                        @forelse ($allCategory as $category)
-                            <a href="{{ url('/category/' . $category->id) }}"
-                                class="inline-block truncate px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold cursor-pointer">
-                                {{ $category->content }}
-                            </a>
-                        @endforeach
-                    </div>
+                    <h4 class="mb-4 text-base text-black">ALL TOPICS</h4>
+                    @forelse ($allCategory as $category)
+                        <a
+                            class="inline-block truncate px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold cursor-pointer">
+                            {{ $category->content }}
+                        </a>
+                    @endforeach
+                </div>
                 </div>
 
                 <div class='w-full mt-8'>

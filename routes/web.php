@@ -25,6 +25,7 @@ Route::get('/writing', function () { return view('writing');})->name('writing')-
 Route::get('/post-content-viewer/{id}', [PostController::class, 'viewContentJson'])->name('post.content.viewer');
 Route::get('/user-profile/{id}', [UserController::class, 'userProfile'])->name('userProfile')->middleware(accessUserProfile::class);// User profile
 Route::get('/loadUserNotify',[NotifyController::class, 'loadUserNotify'])->name('loadUserNotify')->middleware('auth');
+Route::get('/category/{id}', [CategoryController::class, 'categoryPage'])->name('categoryPage');
 // LOGIN/OUT HANDLE
 Route::post('/handle_login', [AuthController::class, 'login']);
 Route::post('/handle_signup', [AuthController::class, 'signup'])->name('register');

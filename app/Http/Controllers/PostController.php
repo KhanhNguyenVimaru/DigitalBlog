@@ -35,16 +35,6 @@ class PostController extends Controller
             ->limit(3)
             ->get();
 
-        // $users = User::withCount('likesThroughPosts')
-        //     ->having('likes_through_posts_count', '>', 0)
-        //     ->orderByDesc('likes_through_posts_count')
-        //     ->limit(3)
-        //     ->get();
-
-        // $posts = Post::withCount('comments')
-        //     ->having('comments_count', '>', 5)
-        //     ->get();
-
         $allCategory = category::all();
         // Lấy bài viết được like nhiều trong 7 ngày qua
         $topLikedPosts = Post::withCount('likes')
