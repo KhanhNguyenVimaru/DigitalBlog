@@ -77,7 +77,7 @@
                     </div>
                     <!-- Thông tin bên phải, content fit, căn phải -->
                     <div class="flex flex-col items-start justify-center flex-1 pl-4">
-                        <div class="flex flex-row items-center gap-2 mb-1">
+                        <div class="flex flex-row items-center gap-2">
                             <h2 class="text-base font-bold text-gray-800 truncate">{{ $user->name }}</h2>
                             @if (Auth::id() !== $user->id)
                                 @if ($already_followed)

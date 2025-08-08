@@ -58,21 +58,29 @@ class UserController extends Controller
     {
         $user = Auth::user();
         $count_follower = \App\Models\followUser::where('authorId', $user->id)
-            ->where('banned', false) // không bị ban
-            ->orWhere('banned', null)
+            ->where(function ($q) {
+                $q->where('banned', false)
+                    ->orWhereNull('banned');
+            })
             ->count();
         $count_following = \App\Models\followUser::where('followerId', $user->id)
-            ->where('banned', false) // không bị ban
-            ->orWhere('banned', null)
+            ->where(function ($q) {
+                $q->where('banned', false)
+                    ->orWhereNull('banned');
+            })
             ->count();
 
         $followers = \App\Models\followUser::where('authorId', $user->id)->with('follower')
-            ->where('banned', false) // không bị ban
-            ->orWhere('banned', null)
+            ->where(function ($q) {
+                $q->where('banned', false)
+                    ->orWhereNull('banned');
+            })
             ->get();
         $following = \App\Models\followUser::where('followerId', $user->id)->with('following')
-            ->where('banned', false) // không bị ban
-            ->orWhere('banned', null)
+            ->where(function ($q) {
+                $q->where('banned', false)
+                    ->orWhereNull('banned');
+            })
             ->get();
 
         return view('myProfile', compact('user', 'count_follower', 'count_following', 'followers', 'following'));

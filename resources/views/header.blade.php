@@ -79,6 +79,7 @@
 <script src="/js/search_suggest.js"></script>
 <script>
     window.userProfileUrlBase = "{{ url('/user-profile') }}/";
+    window.postAddressBase = "{{ url('/post-content-viewer') }}/";
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -173,6 +174,7 @@
                             } else {
                                 html += notifies.map(n => {
                                     let userSentId = n.send_from_id;
+                                    let postId = n.addition || '';
                                     if (n.type === 'follow_request') {
                                         return `<div
                                             class="flex items-center justify-between gap-2 py-2 hover:bg-gray-50 h-[40px]"
@@ -183,7 +185,7 @@
                                         </div>`;
                                     } else if (n.type === 'new_post') {
                                         return `<div class="flex items-center justify-between h-[40px] text-sm py-2 px-2 hover:bg-gray-50 text-gray-600">
-                                            <span onclick="window.location.href='${window.userProfileUrlBase}${userSentId}'" class="flex-1 cursor-pointer">${n.notify_content || 'You have a new notification.'}</span>
+                                            <span onclick="window.location.href='${window.postAddressBase}${postId}'" class="flex-1 cursor-pointer">${n.notify_content || 'You have a new notification.'}</span>
                                             <button onclick="deleteNotify(${n.id}, event)" class="text-gray-500 hover:text-red-600 cursor-pointer" title="Delete">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
