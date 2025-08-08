@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Group;
 use App\Models\Post;
 use App\Models\followUser;
+
 class UserController extends Controller
 {
     public function userProfile(Request $request, $id)
@@ -24,22 +25,30 @@ class UserController extends Controller
         $ban = $request->get('ban', false);
 
         $count_follower = followUser::where('authorId', $user->id)
-            ->where('banned', false) // không bị ban
-            ->orWhere('banned', null)
+            ->where(function ($q) {
+                $q->where('banned', false)
+                    ->orWhereNull('banned');
+            })
             ->count();
 
         $count_following = followUser::where('followerId', $user->id)
-            ->where('banned', false) // không bị ban
-            ->orWhere('banned', null)
+            ->where(function ($q) {
+                $q->where('banned', false)
+                    ->orWhereNull('banned');
+            })
             ->count();
 
         $followers = followUser::where('authorId', $user->id)->with('follower')
-            ->where('banned', false) // không bị ban
-            ->orWhere('banned', null)
+            ->where(function ($q) {
+                $q->where('banned', false)
+                    ->orWhereNull('banned');
+            })
             ->get();
-        $following = followUser::where('followerId', $user->id)->with('author')
-            ->where('banned', false) // không bị ban
-            ->orWhere('banned', null)
+        $following = followUser::where('followerId', $user->id)->with('following')
+            ->where(function ($q) {
+                $q->where('banned', false)
+                    ->orWhereNull('banned');
+            })
             ->get();
 
         return view('userProfile', compact('user', 'private_profile', 'already_followed', 'request_sent', 'can_request_again', 'count_follower', 'count_following', 'followers', 'following', 'ban',));
@@ -188,10 +197,10 @@ class UserController extends Controller
         $q = $request->input('q', '');
         if (!$q) return response()->json([]);
         $limit = 10;
-        $users = \App\Models\User::where(function($query) use ($q) {
-                $query->where('name', 'like', "%$q%")
-                      ->orWhere('email', 'like', "%$q%");
-            })
+        $users = \App\Models\User::where(function ($query) use ($q) {
+            $query->where('name', 'like', "%$q%")
+                ->orWhere('email', 'like', "%$q%");
+        })
             ->selectRaw("'user' as type, name as value, id")
             ->limit($limit)->get();
         $groups = Group::where('name', 'like', "%$q%")

@@ -70,12 +70,12 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(like::class, post::class);
     }
-    // public function follow_users()
+    // public function inRelationships()
     // {
-    //     return $this->hasMany(followUser::class, 'followerId');
+    //     return $this->belongsTo(followUser::class, 'authorId', 'followerId');
     // }
 
-    // Những user mà user này đang follow
+
     public function following()
     {
         return $this->belongsToMany(

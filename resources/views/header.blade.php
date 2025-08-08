@@ -181,7 +181,7 @@
                                             <button class="cursor-pointer hover:bg-blue-300 accept-follow-btn bg-blue-500 text-white px-2 py-1 rounded text-xs mr-1" data-id="${n.id}" onclick="acceptRequest(${n.id}, ${n.send_from_id})">Accept</button>
                                             <button class="cursor-pointer hover:bg-gray-300 reject-follow-btn bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs" data-id="${n.id}" onclick="denyRequest(${n.id}, ${n.send_from_id})">X</button>
                                         </div>`;
-                                    } else {
+                                    } else if (n.type === 'new_post') {
                                         return `<div class="flex items-center justify-between h-[40px] text-sm py-2 px-2 hover:bg-gray-50 text-gray-600">
                                             <span onclick="window.location.href='${window.userProfileUrlBase}${userSentId}'" class="flex-1 cursor-pointer">${n.notify_content || 'You have a new notification.'}</span>
                                             <button onclick="deleteNotify(${n.id}, event)" class="text-gray-500 hover:text-red-600 cursor-pointer" title="Delete">
