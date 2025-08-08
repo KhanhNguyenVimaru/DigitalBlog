@@ -5,7 +5,6 @@
         </div>
         <div class="flex gap-6 mb-2 md:mb-0">
             <a href="/" class="text-gray-600 hover:text-blue-600 text-sm font-semibold">Feed</a>
-            <a href="#" class="text-gray-600 hover:text-blue-600 text-sm font-semibold">Community</a>
             <a href="/writing" class="text-gray-600 hover:text-blue-600 text-sm font-semibold">Writing</a>
             <a href="#" class="text-gray-600 hover:text-blue-600 text-sm font-semibold">About</a>
         </div>

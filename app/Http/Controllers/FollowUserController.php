@@ -83,7 +83,7 @@ class FollowUserController extends Controller
 
     public function denyRequest(Request $request)
     {
-        $send_from_id = $request->send_from_id; 
+        $send_from_id = $request->send_from_id;
         $notify_id = $request->id;
         try {
             $remove_request = followRequest::where('followedId', Auth::id())->where('userId_request', $send_from_id)->delete();

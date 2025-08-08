@@ -22,7 +22,8 @@
             </a>
             <a href="#" id="search-nav-link"
                 class="text-sm font-semibold text-gray-600 hover:text-black px-4">Search</a>
-            <a href="" class="text-sm font-semibold text-gray-600 hover:text-black px-4 whitespace-nowrap">About Us</a>
+            <a href=""
+                class="text-sm font-semibold text-gray-600 hover:text-black px-4 whitespace-nowrap">About</a>
 
         </div>
         <div class="flex flex-1 justify-end min-w-0 items-center gap-3 relative">
@@ -174,18 +175,26 @@
                                     let userSentId = n.send_from_id;
                                     if (n.type === 'follow_request') {
                                         return `<div
-                                    class="flex items-center justify-between gap-2 py-2 hover:bg-gray-50 h-[40px]"
-                                    onclick="window.location.href='${window.userProfileUrlBase}${userSentId}'">
-                                    <span class="text-sm text-gray-600 flex-1">${n.notify_content || 'You have a new follow request.'}</span>
-                                    <button class="cursor-pointer hover:bg-blue-300 accept-follow-btn bg-blue-500 text-white px-2 py-1 rounded text-xs mr-1" data-id="${n.id}" onclick = "acceptRequest(${n.id}, ${n.send_from_id})">Accept</button>
-                                    <button class="cursor-pointer hover:bg-gray-300 reject-follow-btn bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs" data-id="${n.id}" onclick = "denyRequest(${n.id}, ${n.send_from_id})">X</button>
-                                </div>`;
+                                            class="flex items-center justify-between gap-2 py-2 hover:bg-gray-50 h-[40px]"
+                                            onclick="window.location.href='${window.userProfileUrlBase}${userSentId}'">
+                                            <span class="text-sm text-gray-600 flex-1">${n.notify_content || 'You have a new follow request.'}</span>
+                                            <button class="cursor-pointer hover:bg-blue-300 accept-follow-btn bg-blue-500 text-white px-2 py-1 rounded text-xs mr-1" data-id="${n.id}" onclick="acceptRequest(${n.id}, ${n.send_from_id})">Accept</button>
+                                            <button class="cursor-pointer hover:bg-gray-300 reject-follow-btn bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs" data-id="${n.id}" onclick="denyRequest(${n.id}, ${n.send_from_id})">X</button>
+                                        </div>`;
                                     } else {
-                                        return `<div onclick="window.location.href='${window.userProfileUrlBase}${userSentId}'" class="h-[40px] text-sm py-2 cursor-pointer hover:bg-gray-50 text-gray-600">${n.notify_content || 'You have a new notification.'}</div>`;
+                                        return `<div class="flex items-center justify-between h-[40px] text-sm py-2 px-2 hover:bg-gray-50 text-gray-600">
+                                            <span onclick="window.location.href='${window.userProfileUrlBase}${userSentId}'" class="flex-1 cursor-pointer">${n.notify_content || 'You have a new notification.'}</span>
+                                            <button onclick="deleteNotify(${n.id}, event)" class="text-gray-500 hover:text-red-600 cursor-pointer" title="Delete">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>`;
                                     }
                                 }).join('');
                             }
                             dropdown.innerHTML = html;
+
                         });
                 }
                 dropdown.classList.toggle('hidden');
@@ -284,3 +293,37 @@
             });
     }
 </script>
+<script>
+    function deleteNotify(id, event) {
+        // Ngăn việc click lan ra ngoài gây đóng dropdown
+        event.stopPropagation();
+
+        // Lấy phần tử thông báo
+        let btn = event.currentTarget;
+        let parentDiv = btn.closest('div');
+
+        // Xóa ngay trên giao diện
+        if (parentDiv) {
+            parentDiv.remove();
+        }
+
+        // Gửi request AJAX đến Laravel
+        fetch(`/delete-notify`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) {
+                alert(data.message || 'Xóa thất bại.');
+            }
+        })
+        .catch(err => console.error('Error:', err));
+    }
+</script>
+
+

@@ -88,13 +88,13 @@
                                         class="bg-gray-400 cursor-pointer text-white font-semibold px-4 py-1 rounded-full shadow transition text-xs mx-2">Pending</button>
                                 @elseif($can_request_again)
                                     <button id="request-btn"
-                                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-1 rounded-full shadow transition text-xs mx-2 ">Request</button>
+                                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-1 rounded-full shadow transition text-xs mx-2 cursor-pointer">Request</button>
                                 @elseif($ban)
                                     <button id="ban-btn"
                                         class="bg-gray-400 cursor-pointer text-white font-semibold px-4 py-1 rounded-full shadow transition text-xs mx-2">Unblock</button>
                                 @else
                                     <button id="follow-btn"
-                                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-1 rounded-full shadow transition text-xs mx-2">Follow</button>
+                                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-1 rounded-full shadow transition text-xs mx-2 cursor-pointer">Follow</button>
                                 @endif
                             @else
                                 <a href="{{ route('account') }}"
@@ -104,7 +104,7 @@
                                 <!-- Nút bấm SVG -->
                                 <button id="menuButton" class="p-2 rounded hover:bg-gray-100">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        stroke-width="1.5" stroke="currentColor" class="size-6 cursor-pointer">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                     </svg>
@@ -114,7 +114,7 @@
                                 <div id="menuDropdown"
                                     class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg hidden">
                                     <a href="{{ route('banUser', ['id' => $user->id]) }}"
-                                        class="block px-4 py-2 text-sm text-red-500 hover:bg-gray-100">Ban this user</a>
+                                        class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Ban this user</a>
                                 </div>
                             </div>
                         </div>
