@@ -27,6 +27,7 @@ Route::get('/user-profile/{id}', [UserController::class, 'userProfile'])->name('
 Route::get('/loadUserNotify',[NotifyController::class, 'loadUserNotify'])->name('loadUserNotify')->middleware('auth');
 Route::get('/category/{id}', [PostController::class, 'categoryPage'])->name('categoryPage');
 Route::get('/notify/account-not-existed', function () {return view('notify.accountNotExisted');})->name('notify.accountNotExisted');
+Route::get('/about', function () {return view('about');})->name('about');
 // LOGIN/OUT HANDLE
 Route::post('/handle_login', [AuthController::class, 'login']);
 Route::post('/handle_signup', [AuthController::class, 'signup'])->name('register');

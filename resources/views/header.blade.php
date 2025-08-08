@@ -22,7 +22,7 @@
             </a>
             <a href="#" id="search-nav-link"
                 class="text-sm font-semibold text-gray-600 hover:text-black px-4">Search</a>
-            <a href=""
+            <a href="/about"
                 class="text-sm font-semibold text-gray-600 hover:text-black px-4 whitespace-nowrap">About</a>
 
         </div>

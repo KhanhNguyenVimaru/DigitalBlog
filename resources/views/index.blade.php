@@ -154,7 +154,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                     </svg>
-                                    <a class="cursor-pointer hover:text-blue-700">For Beginner Writers</a>
+                                    <a href="http://127.0.0.1:8000/post-content-viewer/99" class="cursor-pointer hover:text-blue-700">For Beginner Writers</a>
                                 </li>
                                 <li class="flex items-center space-x-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -162,7 +162,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
                                     </svg>
-                                    <a class="cursor-pointer hover:text-blue-700">Advanced Writing Skills</a>
+                                    <a href="http://127.0.0.1:8000/post-content-viewer/100" class="cursor-pointer hover:text-blue-700">Advanced Writing Skills</a>
                                 </li>
                             </ul>
                         </div>

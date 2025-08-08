@@ -20,43 +20,60 @@ use App\Models\category;
 use App\Models\followUser;
 use App\Models\User;
 use App\Models\Notify;
+
 class PostController extends Controller
 {
     public function categoryPosts($categoryId, $sortBy = 'latest')
     {
         $category = Category::findOrFail($categoryId);
-
         if (Auth::check()) {
             $query = Post::with(['category', 'author'])
                 ->withCount(['likes', 'comment'])
                 ->where('status', 'public')
                 ->where('categoryId', $categoryId)
-                ->whereHas('author', function ($q) {
-                    $q->where('privacy', 'public');
+                ->whereHas('author', function ($query) {
+                    $query->where('privacy', 'public');
                 })
-                ->whereDoesntHave('author.followers', function ($q) {
-                    $q->where('followerId', Auth::id())
-                        ->where('banned', true);
-                })
-                ->whereDoesntHave('author.following', function ($q) {
-                    $q->where('authorId', Auth::id())
-                        ->where('banned', true);
-                })
-                ->orWhere('authorId', Auth::id())
-                ->orderBy('created_at', 'desc');
+                ->where(function ($sub) {
+                    $sub->where(function ($banCheck) {
+                        // Chặn follower bị banned
+                        $banCheck->whereDoesntHave('author.followers', function ($q) {
+                            $q->where('followerId', Auth::id())
+                                ->where('banned', true);
+                        })
+                            // Chặn following bị banned
+                            ->whereDoesntHave('author.following', function ($q) {
+                                $q->where('authorId', Auth::id())
+                                    ->where('banned', true);
+                            });
+                    })
+                        // Hoặc vẫn cho phép xem bài của chính mình
+                        ->orWhere('authorId', Auth::id());
+                });
         } else {
             $query = Post::with(['category', 'author'])
                 ->withCount(['likes', 'comment'])
                 ->where('status', 'public')
-                ->where('categoryId', $categoryId)
-                ->whereHas('author', function ($q) {
-                    $q->where('privacy', 'public');
-                })
-                ->orWhere('authorId', Auth::id())
-                ->orderBy('created_at', 'desc');
+                ->whereHas('author', function ($query) {
+                    $query->where('privacy', 'public');
+                });
         }
+        // $query = Post::with(['category', 'author'])
+        //     ->withCount(['likes', 'comment'])
+        //     ->where('status', 'public')
+        //     ->where('categoryId', $categoryId)
+        //     ->whereHas('author', function ($q) {
+        //         $q->where('privacy', 'public');
+        //     })
+        //     ->where(function ($sub) {
+        //         $sub->whereDoesntHave('author.followers', function ($q) {
+        //             $q->where('followerId', Auth::id())
+        //                 ->where('banned', true);
+        //         })
+        //             ->orWhere('authorId', Auth::id());
+        //     });
 
-        // Apply sorting based on filter
+
         switch ($sortBy) {
             case 'popular':
                 $query->orderByDesc('likes_count');
@@ -90,6 +107,7 @@ class PostController extends Controller
         });
 
         return response()->json([
+            'check_category' => $categoryId,
             'success' => true,
             'message' => 'Posts retrieved successfully',
             'posts' => $posts
@@ -133,25 +151,29 @@ class PostController extends Controller
                 ->whereHas('author', function ($query) {
                     $query->where('privacy', 'public');
                 })
-                ->whereDoesntHave('author.followers', function ($q) {
-                    $q->where('followerId', Auth::id())
-                        ->where('banned', true);
-                })
-                ->whereDoesntHave('author.following', function ($q) {
-                    $q->where('authorId', Auth::id())
-                        ->where('banned', true);
-                })
-                ->orWhere('authorId', Auth::id())
-                ->orderBy('created_at', 'desc');
+                ->where(function ($sub) {
+                    $sub->where(function ($banCheck) {
+                        // Chặn follower bị banned
+                        $banCheck->whereDoesntHave('author.followers', function ($q) {
+                            $q->where('followerId', Auth::id())
+                                ->where('banned', true);
+                        })
+                            // Chặn following bị banned
+                            ->whereDoesntHave('author.following', function ($q) {
+                                $q->where('authorId', Auth::id())
+                                    ->where('banned', true);
+                            });
+                    })
+                        // Hoặc vẫn cho phép xem bài của chính mình
+                        ->orWhere('authorId', Auth::id());
+                });
         } else {
             $query = Post::with(['category', 'author'])
                 ->withCount(['likes', 'comment'])
                 ->where('status', 'public')
                 ->whereHas('author', function ($query) {
                     $query->where('privacy', 'public');
-                })
-                ->orWhere('authorId', Auth::id())
-                ->orderBy('created_at', 'desc');
+                });
         }
 
         // Apply sorting based on filter
@@ -169,6 +191,7 @@ class PostController extends Controller
 
         $allPosts = $query->paginate(5, ['*'], 'show-page')->appends(['filter' => $sortBy]);
 
+        // Tạo preview
         $allPosts->getCollection()->transform(function ($post) {
             $preview = '';
             $contentArr = json_decode($post->content, true);
@@ -191,6 +214,7 @@ class PostController extends Controller
             'message' => 'Posts retrieved successfully'
         ]);
     }
+
     public function homePosts()
     {
         $bestAuthors = User::select('users.*')
@@ -215,20 +239,24 @@ class PostController extends Controller
                 Carbon::now()->subDays(7)->startOfDay(),
                 Carbon::now()->endOfDay()
             ])
-            ->where('status', 'public')
-            ->whereHas('author', function ($query) {
-                $query->where('privacy', 'public');
-            })
-            ->whereDoesntHave('author.followers', function ($query) {
-                $query->where('followerId', Auth::id())
-                    ->where('banned', true);
-            })
-            ->whereDoesntHave('author.following', function ($query) {
-                $query->where('authorId', Auth::id())
-                    ->where('banned', true);
+            ->where(function ($q) {
+                $q->where(function ($query) {
+                    $query->where('status', 'public')
+                        ->whereHas('author', function ($query) {
+                            $query->where('privacy', 'public');
+                        })
+                        ->whereDoesntHave('author.followers', function ($query) {
+                            $query->where('followerId', Auth::id())
+                                ->where('banned', true);
+                        })
+                        ->whereDoesntHave('author.following', function ($query) {
+                            $query->where('authorId', Auth::id())
+                                ->where('banned', true);
+                        });
+                })
+                    ->orWhere('authorId', Auth::id());
             })
             ->orderBy('likes_count', 'desc')
-            ->orWhere('authorId', Auth::id())
             ->limit(4)
             ->get();
 
@@ -375,7 +403,7 @@ class PostController extends Controller
             DB::commit();
             $username = User::where('id', $userId)->value('name');
 
-            if($post){
+            if ($post) {
                 // Tạo thông báo cho người theo dõi
                 $followers = User::whereHas('followers', function ($query) use ($userId) {
                     $query->where('followerId', $userId);
