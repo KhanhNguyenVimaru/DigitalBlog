@@ -13,6 +13,7 @@ use Laravel\Passport\HasApiTokens;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\post;
+use App\Models\followUser;
 
 class User extends Authenticatable
 {
@@ -69,4 +70,32 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(like::class, post::class);
     }
+    // public function follow_users()
+    // {
+    //     return $this->hasMany(followUser::class, 'followerId');
+    // }
+
+    // Những user mà user này đang follow
+    public function following()
+    {
+        return $this->belongsToMany(
+            User::class,     // Model liên quan (vẫn là User)
+            'follow_users',       // Tên bảng pivot
+            'followerId',   // FK trong pivot trỏ tới user hiện tại
+            'authorId'    // FK trong pivot trỏ tới user được follow
+        );
+    }
+
+    // Những user đang follow user này
+    public function followers()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'follow_users',
+            'authorId',   // FK trong pivot trỏ tới user hiện tại
+            'followerId'    // FK trong pivot trỏ tới user follower
+        );
+    }
 }
+
+

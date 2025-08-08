@@ -21,23 +21,51 @@ class UserController extends Controller
         $already_followed = $request->get('already_followed', false);
         $request_sent = $request->get('request_sent', false);
         $can_request_again = $request->get('can_request_again', false);
+        $ban = $request->get('ban', false);
 
-        $count_follower = followUser::where('authorId', $user->id)->count();
-        $count_following = followUser::where('followerId', $user->id)->count();
+        $count_follower = followUser::where('authorId', $user->id)
+            ->where('banned', false) // không bị ban
+            ->orWhere('banned', null)
+            ->count();
 
-        $followers = followUser::where('authorId', $user->id)->with('follower')->get();
-        $following = followUser::where('followerId', $user->id)->with('author')->get();
+        $count_following = followUser::where('followerId', $user->id)
+            ->where('banned', false) // không bị ban
+            ->orWhere('banned', null)
+            ->count();
 
-        return view('userProfile', compact('user', 'private_profile', 'already_followed', 'request_sent', 'can_request_again', 'count_follower', 'count_following', 'followers', 'following'));
+        $followers = followUser::where('authorId', $user->id)->with('follower')
+            ->where('banned', false) // không bị ban
+            ->orWhere('banned', null)
+            ->get();
+        $following = followUser::where('followerId', $user->id)->with('author')
+            ->where('banned', false) // không bị ban
+            ->orWhere('banned', null)
+            ->get();
+
+        return view('userProfile', compact('user', 'private_profile', 'already_followed', 'request_sent', 'can_request_again', 'count_follower', 'count_following', 'followers', 'following', 'ban',));
     }
 
     public function myProfile(Request $request)
     {
         $user = Auth::user();
-        $count_follower = \App\Models\followUser::where('authorId', $user->id)->count();
-        $count_following = \App\Models\followUser::where('followerId', $user->id)->count();
-        $followers = \App\Models\followUser::where('authorId', $user->id)->with('follower')->get();
-        $following = \App\Models\followUser::where('followerId', $user->id)->with('author')->get();
+        $count_follower = \App\Models\followUser::where('authorId', $user->id)
+            ->where('banned', false) // không bị ban
+            ->orWhere('banned', null)
+            ->count();
+        $count_following = \App\Models\followUser::where('followerId', $user->id)
+            ->where('banned', false) // không bị ban
+            ->orWhere('banned', null)
+            ->count();
+
+        $followers = \App\Models\followUser::where('authorId', $user->id)->with('follower')
+            ->where('banned', false) // không bị ban
+            ->orWhere('banned', null)
+            ->get();
+        $following = \App\Models\followUser::where('followerId', $user->id)->with('following')
+            ->where('banned', false) // không bị ban
+            ->orWhere('banned', null)
+            ->get();
+
         return view('myProfile', compact('user', 'count_follower', 'count_following', 'followers', 'following'));
     }
 
@@ -76,6 +104,22 @@ class UserController extends Controller
             return redirect('/page_account')->with('success', 'Account settings updated successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Failed to update account settings. Please try again.'])->withInput();
+        }
+    }
+    public function deleteBan($id)
+    {
+        try {
+            $myId = Auth::user()->id;
+            $deleted = followUser::where('authorId', $id)
+                ->where('followerId', $myId)
+                ->delete();
+            if ($deleted) {
+                return response()->json(['success' => true, 'message' => 'Unblocked successfully.']);
+            } else {
+                return response()->json(['success' => false, 'message' => 'No ban relationship found.']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
 

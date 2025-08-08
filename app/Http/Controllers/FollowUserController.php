@@ -10,11 +10,49 @@ use App\Models\followRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Notify;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 
 class FollowUserController extends Controller
 {
-   public function acceptRequest(Request $request)
+    public function banUser($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = User::findOrFail($id);
+            $my_id = Auth::id();
+
+            $myside_relation = followUser::where(function ($q) use ($my_id, $id) {
+                $q->where('authorId', $id)
+                    ->where('followerId', $my_id);
+                })->first();
+
+            $thierside_relation = followUser::where(function ($q) use ($my_id, $id) {
+                $q->where('authorId', $my_id)
+                    ->where('followerId', $id);
+                })->first();
+
+            if ($myside_relation) {
+                $myside_relation->banned = true;
+                $myside_relation->save();
+            } else {
+                $ban = new followUser();
+                $ban->authorId = $id;
+                $ban->followerId = $my_id;
+                $ban->banned = true;
+                $ban->save();
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'User has been banned successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Ban user failed: ' . $e->getMessage());
+        }
+    }
+
+
+    public function acceptRequest(Request $request)
     {
         try {
             $my_id = Auth::id();
@@ -45,7 +83,7 @@ class FollowUserController extends Controller
 
     public function denyRequest(Request $request)
     {
-        $send_from_id = $request->send_from_id;
+        $send_from_id = $request->send_from_id; 
         $notify_id = $request->id;
         try {
             $remove_request = followRequest::where('followedId', Auth::id())->where('userId_request', $send_from_id)->delete();
@@ -155,60 +193,5 @@ class FollowUserController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
-    }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorefollowUserRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(followUser $followUser)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(followUser $followUser)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatefollowUserRequest $request, followUser $followUser)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(followUser $followUser)
-    {
-        //
     }
 }

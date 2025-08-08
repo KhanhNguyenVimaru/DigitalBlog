@@ -147,7 +147,7 @@
                             <div class="text-gray-500 text-lg">No following yet.</div>
                         @else
                             @foreach ($following as $item)
-                                @php $a = $item->author; @endphp
+                                @php $a = $item->following; @endphp
                                 <a href="{{ route('userProfile', ['id' => $a->id]) }}"
                                     class="flex items-center gap-4 p-4 hover:bg-gray-50 transition rounded cursor-pointer">
                                     <img src="{{ $a->avatar ?? 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg' }}"
@@ -334,7 +334,7 @@
                                 <a href="/post-content-viewer/${post.id}" class="font-bold text-base text-black cursor-pointer post-title-hover hover:text-blue-600 hover:underline-0 line-clamp-2 h-[48px]" style="text-decoration: none;">${post.title || 'load title failed'}</a>
                                 <div class="text-gray-600 text-sm mt-1 ">${post.preview || ''}</div>
                                 <div class="flex flex-row items-center gap-2 mt-2">
-                                    <span class="inline-block truncate px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold cursor-pointer">${categoryName}</span>
+                                    <span class="inline-block truncate px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold cursor-pointer" style="max-width: 60px">${categoryName}</span>
                                     <span class="px-2 py-1 rounded text-xs ${post.status === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'} cursor-pointer">${status}</span>
                                     <span class="text-xs text-gray-400 ml-auto">${createdAt}</span>
                                 </div>

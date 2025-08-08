@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use App\Models\category;
+use App\Models\followUser;
 use App\Models\User;
 
 class PostController extends Controller
@@ -29,9 +30,19 @@ class PostController extends Controller
             ->withCount(['likes', 'comment'])
             ->where('status', 'public')
             ->where('categoryId', $categoryId)
-            ->whereHas('author', function ($query) {
-                $query->where('privacy', 'public');
-            });
+            ->whereHas('author', function ($q) {
+                $q->where('privacy', 'public');
+            })
+            ->whereDoesntHave('author.followers', function ($q) {
+                $q->where('followerId', Auth::id())
+                    ->where('banned', true);
+            })
+            ->whereDoesntHave('author.following', function ($q) {
+                $q->where('authorId', Auth::id())
+                    ->where('banned', true);
+            })
+            ->orWhere('authorId', Auth::id())
+            ->orderBy('created_at', 'desc');
 
         // Apply sorting based on filter
         switch ($sortBy) {
@@ -75,30 +86,30 @@ class PostController extends Controller
     public function categoryPage($id)
     {
         $pageId = $id;
-            $allCategory = Category::all();
-            $bestAuthors = User::select('users.*')
-                ->addSelect([
-                    'likes_count' => DB::table('likes')
-                        ->join('posts', 'posts.id', '=', 'likes.post_id')
-                        ->whereColumn('posts.authorId', 'users.id')
-                        ->selectRaw('COUNT(*)')
-                ])
-                ->having('likes_count', '>', 0)
-                ->orderByDesc('likes_count')
-                ->limit(3)
-                ->get();
+        $allCategory = Category::all();
+        $bestAuthors = User::select('users.*')
+            ->addSelect([
+                'likes_count' => DB::table('likes')
+                    ->join('posts', 'posts.id', '=', 'likes.post_id')
+                    ->whereColumn('posts.authorId', 'users.id')
+                    ->selectRaw('COUNT(*)')
+            ])
+            ->having('likes_count', '>', 0)
+            ->orderByDesc('likes_count')
+            ->limit(3)
+            ->get();
 
-            $category = Category::findOrFail($id);
+        $category = Category::findOrFail($id);
 
-            // Fetch the first public post for the header image
-            $firstPost = Post::where('categoryId', $id)
-                ->where('status', 'public')
-                ->whereHas('author', function ($query) {
-                    $query->where('privacy', 'public');
-                })
-                ->first();
+        // Fetch the first public post for the header image
+        $firstPost = Post::where('categoryId', $id)
+            ->where('status', 'public')
+            ->whereHas('author', function ($query) {
+                $query->where('privacy', 'public');
+            })
+            ->first();
 
-            return view('categoryPage', compact('category', 'bestAuthors', 'allCategory', 'firstPost', 'pageId'));
+        return view('categoryPage', compact('category', 'bestAuthors', 'allCategory', 'firstPost', 'pageId'));
     }
 
     public function allPosts($sortBy = 'latest')
@@ -108,7 +119,17 @@ class PostController extends Controller
             ->where('status', 'public')
             ->whereHas('author', function ($query) {
                 $query->where('privacy', 'public');
-            });
+            })
+            ->whereDoesntHave('author.followers', function ($q) {
+                $q->where('followerId', Auth::id())
+                    ->where('banned', true);
+            })
+            ->whereDoesntHave('author.following', function ($q) {
+                $q->where('authorId', Auth::id())
+                    ->where('banned', true);
+            })
+            ->orWhere('authorId', Auth::id())
+            ->orderBy('created_at', 'desc');
 
         // Apply sorting based on filter
         switch ($sortBy) {
@@ -175,7 +196,16 @@ class PostController extends Controller
             ->whereHas('author', function ($query) {
                 $query->where('privacy', 'public');
             })
+            ->whereDoesntHave('author.followers', function ($query) {
+                $query->where('followerId', Auth::id())
+                    ->where('banned', true);
+            })
+            ->whereDoesntHave('author.following', function ($query) {
+                $query->where('authorId', Auth::id())
+                    ->where('banned', true);
+            })
             ->orderBy('likes_count', 'desc')
+            ->orWhere('authorId', Auth::id())
             ->limit(4)
             ->get();
 

@@ -26,6 +26,7 @@ Route::get('/post-content-viewer/{id}', [PostController::class, 'viewContentJson
 Route::get('/user-profile/{id}', [UserController::class, 'userProfile'])->name('userProfile')->middleware(accessUserProfile::class);// User profile
 Route::get('/loadUserNotify',[NotifyController::class, 'loadUserNotify'])->name('loadUserNotify')->middleware('auth');
 Route::get('/category/{id}', [PostController::class, 'categoryPage'])->name('categoryPage');
+Route::get('/notify/account-not-existed', function () {return view('notify.accountNotExisted');})->name('notify.accountNotExisted');
 // LOGIN/OUT HANDLE
 Route::post('/handle_login', [AuthController::class, 'login']);
 Route::post('/handle_signup', [AuthController::class, 'signup'])->name('register');
@@ -35,6 +36,7 @@ Route::patch('/update_user/{id}', [UserController::class, 'updateUserData'])->na
 Route::delete('/delete_account', [UserController::class, 'deleteUserAccount'])->name('deleteUserAccount')->middleware('auth');
 Route::middleware('auth:api')->post('/change_password', [UserController::class, 'changePassword'])->name('changePassword');
 Route::post('/update-avatar', [UserController::class, 'updateAvatar'])->middleware('auth');
+Route::get('/ban-user/{id}', [FollowUserController::class, 'banUser'])->name('banUser')->middleware('auth');
 Schedule::command(DeleteExpiredAccount::class)->daily();
 // API POST
 Route::post('/insert-post', [PostController::class, 'storeContent'])->name('insertPost')->middleware('auth');
@@ -66,3 +68,5 @@ Route::get('/my-following', [UserController::class, 'getFollowing'])->middleware
 Route::delete('/deny-request',[FollowUserController::class, 'denyRequest'])->middleware('auth');
 Route::post('/accept-request',[FollowUserController::class, 'acceptRequest'])->middleware('auth');
 Route::delete('/delete-notify',[NotifyController::class, 'deleteNotify'])->middleware('auth');
+Route::delete('/delete-ban/{id}', [UserController::class, 'deleteBan'])->middleware('auth'); // trả về số người bị cấm
+
