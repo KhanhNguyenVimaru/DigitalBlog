@@ -192,6 +192,15 @@
                                                 </svg>
                                             </button>
                                         </div>`;
+                                    } else{
+                                        return `<div class="flex items-center justify-between h-[40px] text-sm py-2 px-2 hover:bg-gray-50 text-gray-600">
+                                            <span onclick="window.location.href='${window.userProfileUrlBase}${userSentId}'" class="flex-1 cursor-pointer">${n.notify_content || 'You have a new notification.'}</span>
+                                            <button onclick="deleteNotify(${n.id}, event)" class="text-gray-500 hover:text-red-600 cursor-pointer" title="Delete">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>`;
                                     }
                                 }).join('');
                             }

@@ -36,12 +36,6 @@ class accessUserProfile
         $authorId = $user->id;
         $followerId = Auth::user()->id;
 
-        $alreadyFollowed = followUser::where('authorId', $authorId)
-            ->where('followerId', $followerId)
-            ->where('banned', false) // không bị ban
-            ->orWhere('banned', null)
-            ->exists();
-
         $ban = followUser::where('authorId', $authorId) // user là người chủ động ban
             ->where('followerId', $followerId)
             ->where('banned', true)
@@ -50,6 +44,12 @@ class accessUserProfile
         $banned = followUser::where('authorId', $followerId) // user là người bị ban
             ->where('followerId', $authorId)
             ->where('banned', true)
+            ->exists();
+
+        $alreadyFollowed = followUser::where('authorId', $authorId)
+            ->where('followerId', $followerId)
+            ->where('banned', false) // không bị ban
+            ->orWhere('banned', null)
             ->exists();
         // xử lý các case chặn
         if ($ban) {
