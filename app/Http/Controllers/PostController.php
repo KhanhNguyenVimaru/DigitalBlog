@@ -58,21 +58,6 @@ class PostController extends Controller
                     $query->where('privacy', 'public');
                 });
         }
-        // $query = Post::with(['category', 'author'])
-        //     ->withCount(['likes', 'comment'])
-        //     ->where('status', 'public')
-        //     ->where('categoryId', $categoryId)
-        //     ->whereHas('author', function ($q) {
-        //         $q->where('privacy', 'public');
-        //     })
-        //     ->where(function ($sub) {
-        //         $sub->whereDoesntHave('author.followers', function ($q) {
-        //             $q->where('followerId', Auth::id())
-        //                 ->where('banned', true);
-        //         })
-        //             ->orWhere('authorId', Auth::id());
-        //     });
-
 
         switch ($sortBy) {
             case 'popular':
@@ -405,18 +390,17 @@ class PostController extends Controller
 
             if ($post) {
                 // Tạo thông báo cho người theo dõi
-                $followers = User::whereHas('followers', function ($query) use ($userId) {
-                    $query->where('followerId', $userId);
-                })->get();
+                $followers = Auth::user()->followers; // Collection User theo dõi mình
+
 
                 foreach ($followers as $follower) {
-                    $notify = new Notify();
-                    $notify->send_from_id = $userId;
-                    $notify->send_to_id = $follower->id;
-                    $notify->type = 'new_post';
-                    $notify->notify_content = $username . " has created a new post";
-                    $notify->addition = $post->id; // Lưu ID của bài viết mới
-                    $notify->save();
+                    Notify::create([
+                        'send_from_id' => $userId,
+                        'send_to_id' => $follower->id,
+                        'type' => 'new_post',
+                        'notify_content' => $username . " has created a new post",
+                        'addition' => $post->id
+                    ]);
                 }
             }
 
@@ -424,7 +408,8 @@ class PostController extends Controller
                 'success' => true,
                 'message' => 'Post created successfully',
                 'postId' => $post->id,
-                // 'check_notify' => $followers,
+                'check_follower' => $followers,
+                // 'check_notify' => $notify,
             ], 201);
         } catch (\Throwable $e) {
             DB::rollBack();
