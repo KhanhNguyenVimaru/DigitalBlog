@@ -54,6 +54,7 @@ class PostController extends Controller
             $query = Post::with(['category', 'author'])
                 ->withCount(['likes', 'comment'])
                 ->where('status', 'public')
+                ->where('categoryId', $categoryId)
                 ->whereHas('author', function ($query) {
                     $query->where('privacy', 'public');
                 });
