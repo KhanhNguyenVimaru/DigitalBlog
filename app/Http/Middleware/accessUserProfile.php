@@ -29,7 +29,7 @@ class accessUserProfile
             // sau này bổ sung return 404 khi ban
             return response()->view('404', [], 404);
         }
-        if($user->id === Auth::id()) {
+        if ($user->id === Auth::id()) {
             return redirect()->route('myProfile');
         }
         $pagePrivacy = $user->privacy;
@@ -48,17 +48,20 @@ class accessUserProfile
 
         $alreadyFollowed = followUser::where('authorId', $authorId)
             ->where('followerId', $followerId)
-            ->where('banned', false) // không bị ban
-            ->orWhere('banned', null)
+            ->where(function ($query) {
+                $query->where('banned', false)
+                    ->orWhereNull('banned');
+            })
             ->exists();
+
         // xử lý các case chặn
-        if ($ban) {
-            $request->merge(['ban' => true]);
-        }
-        if($banned) {
+        if ($banned) {
             return response()->view('notify.accountNotExisted', ['error' => 'Oops! This account is not available.'], 404);
         }
 
+        if ($ban) {
+            $request->merge(['ban' => true]);
+        }
         if ($alreadyFollowed) {
             $request->merge(['already_followed' => true]);
         }
