@@ -217,6 +217,7 @@ class PostController extends Controller
 
         $allCategory = Category::all();
 
+        // Query trong 7 ngày gần nhất
         $topLikedPosts = Post::withCount(['likes' => function ($query) {
             $query->where('like', true);
         }])
@@ -246,8 +247,37 @@ class PostController extends Controller
             ->limit(4)
             ->get();
 
+        // Nếu 7 ngày không có post nào thì lấy all time
+        if ($topLikedPosts->isEmpty()) {
+            $topLikedPosts = Post::withCount(['likes' => function ($query) {
+                $query->where('like', true);
+            }])
+                ->with('category')
+                ->where(function ($q) {
+                    $q->where(function ($query) {
+                        $query->where('status', 'public')
+                            ->whereHas('author', function ($query) {
+                                $query->where('privacy', 'public');
+                            })
+                            ->whereDoesntHave('author.followers', function ($query) {
+                                $query->where('followerId', Auth::id())
+                                    ->where('banned', true);
+                            })
+                            ->whereDoesntHave('author.following', function ($query) {
+                                $query->where('authorId', Auth::id())
+                                    ->where('banned', true);
+                            });
+                    })
+                        ->orWhere('authorId', Auth::id());
+                })
+                ->orderBy('likes_count', 'desc')
+                ->limit(4)
+                ->get();
+        }
+
         return view('index', compact('topLikedPosts', 'allCategory', 'bestAuthors'));
     }
+
 
     public function loadLink($request)
     {
